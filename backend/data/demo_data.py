@@ -16,6 +16,10 @@ BUYERS: Dict[str, Dict[str, Any]] = {}
 INQUIRIES: Dict[str, Dict[str, Any]] = {}
 PASSPORTS: Dict[str, Dict[str, Any]] = {}
 PROVENANCE_EVENTS: Dict[str, List[Dict[str, Any]]] = {}  # passport_id -> list of events
+USERS: Dict[str, Dict[str, Any]] = {}  # user_id / email -> user profile
+OTP_SESSIONS: Dict[str, Dict[str, Any]] = {}  # email -> active otp verification session
+ORDERS: Dict[str, Dict[str, Any]] = {}  # order_id -> order details
+REVIEWS: Dict[str, Dict[str, Any]] = {}  # review_id -> review details
 
 def init_demo_data():
     with _LOCK:
@@ -386,7 +390,10 @@ def save_storage():
                 "PRODUCTS": PRODUCTS,
                 "INQUIRIES": INQUIRIES,
                 "PASSPORTS": PASSPORTS,
-                "PROVENANCE_EVENTS": PROVENANCE_EVENTS
+                "PROVENANCE_EVENTS": PROVENANCE_EVENTS,
+                "USERS": USERS,
+                "ORDERS": ORDERS,
+                "REVIEWS": REVIEWS
             }, f, indent=2, ensure_ascii=False)
     except Exception as e:
         print(f"Notice saving storage: {e}")
@@ -405,6 +412,9 @@ def load_storage():
                     INQUIRIES.update(saved.get("INQUIRIES", {}))
                     PASSPORTS.update(saved.get("PASSPORTS", {}))
                     PROVENANCE_EVENTS.update(saved.get("PROVENANCE_EVENTS", {}))
+                    USERS.update(saved.get("USERS", {}))
+                    ORDERS.update(saved.get("ORDERS", {}))
+                    REVIEWS.update(saved.get("REVIEWS", {}))
     except Exception as e:
         print(f"Notice loading storage: {e}")
 

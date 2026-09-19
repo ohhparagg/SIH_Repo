@@ -1,0 +1,10 @@
+{
+  "model_version": "xgboost-v1",
+  "algorithm": "XGBRegressor",
+  "n_samples": 560,
+  "n_train": 448,
+  "n_test": 112,
+  "mae_inr": 220.27,
+  "mape_pct": 9.52,
+  "r2_score": 0.939
+}

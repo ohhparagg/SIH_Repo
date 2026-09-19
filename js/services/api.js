@@ -295,6 +295,121 @@ class ApiService {
       return null;
     }
   }
+
+  // ── Authentication & Email OTP ───────────────────────────────────────
+  async sendOTP(email, role = 'artisan', name = '', purpose = 'register') {
+    try {
+      const res = await fetch(`${this.baseUrl}/auth/send-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, role, name, purpose })
+      });
+      return await res.json();
+    } catch (e) {
+      return { success: false, code: 'NETWORK_ERROR', message: 'Could not connect to authentication service.' };
+    }
+  }
+
+  async verifyOTP(email, otp, role = 'artisan') {
+    try {
+      const res = await fetch(`${this.baseUrl}/auth/verify-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp, role })
+      });
+      return await res.json();
+    } catch (e) {
+      return { success: false, code: 'NETWORK_ERROR', message: 'Could not verify OTP with backend.' };
+    }
+  }
+
+  // ── Artisan Profile Gate ─────────────────────────────────────────────
+  async getArtisanProfile(artisanId = null, token = null) {
+    try {
+      const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+      const query = artisanId ? `?artisan_id=${artisanId}` : '';
+      const res = await fetch(`${this.baseUrl}/artisans/profile${query}`, { headers });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        return { success: false, ...err };
+      }
+      return await res.json();
+    } catch (e) {
+      return null;
+    }
+  }
+
+  async saveArtisanProfile(profileData, token = null) {
+    try {
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const res = await fetch(`${this.baseUrl}/artisans/profile`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(profileData)
+      });
+      return await res.json();
+    } catch (e) {
+      return { success: false, code: 'NETWORK_ERROR', message: 'Failed to save artisan profile.' };
+    }
+  }
+
+  // ── Orders & Purchases ───────────────────────────────────────────────
+  async createOrder(orderData, token = null) {
+    try {
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const res = await fetch(`${this.baseUrl}/orders`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(orderData)
+      });
+      return await res.json();
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // ── Reviews ──────────────────────────────────────────────────────────
+  async getProductReviews(productId) {
+    try {
+      const res = await fetch(`${this.baseUrl}/products/${productId}/reviews`);
+      if (!res.ok) return { product_id: productId, average_rating: 0, total_reviews: 0, reviews: [] };
+      return await res.json();
+    } catch (e) {
+      return { product_id: productId, average_rating: 0, total_reviews: 0, reviews: [] };
+    }
+  }
+
+  async checkReviewEligibility(productId, buyerId = null, token = null) {
+    try {
+      const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+      const query = buyerId ? `?buyer_id=${buyerId}` : '';
+      const res = await fetch(`${this.baseUrl}/products/${productId}/reviews/eligibility${query}`, { headers });
+      return await res.json();
+    } catch (e) {
+      return { canReview: false, reason: 'NETWORK_ERROR' };
+    }
+  }
+
+  async submitProductReview(productId, reviewData, token = null) {
+    try {
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const res = await fetch(`${this.baseUrl}/products/${productId}/reviews`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(reviewData)
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        return { success: false, code: data.detail?.code || data.code || 'REVIEW_FAILED', message: data.detail?.message || data.message || 'Review rejected.' };
+      }
+      return { success: true, ...data };
+    } catch (e) {
+      return { success: false, code: 'NETWORK_ERROR', message: 'Review submission error.' };
+    }
+  }
 }
 
 export const apiService = new ApiService();

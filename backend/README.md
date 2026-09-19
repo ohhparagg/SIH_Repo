@@ -11,7 +11,7 @@ CRAFTORA provides a FastAPI backend designed around the handicraft lifecycle:
 - **Artisan Management**: Complete CRUD for artisan profiles, experience records, languages, and dashboard metrics.
 - **Product & Craft Cataloguing**: Comprehensive craft listings with materials, tags, images, and lifecycle statuses.
 - **AI Cataloguing & Voice Assistant**: Multimodal draft extraction from craft photos and spoken audio/transcripts (Hindi `hi-IN` & English `en-IN`), plus lighting enhancement simulation.
-- **Smart Pricing Engine**: Transparent cost itemization (Raw Materials + Labour Wages + Production Days + Packaging) and AI Indicative Selling Price recommendations with artisan profit calculations.
+- **Smart Pricing Engine**: Transparent cost itemization (Raw Materials + Labour Wages + Production Days + Packaging) plus an AI Indicative Selling Price from a **RandomForestRegressor trained on CRAFTORA's own seed pricing dataset** (`backend/data/pricing_dataset.csv`, see `backend/ml/`) — not a hardcoded multiplier. Falls back to a transparent cost-plus-margin formula if the trained model file is ever unavailable.
 - **Rule-Based Buyer Matching**: Sourcing recommendations connecting crafts with commercial retailers, interior designers, and corporate gifting buyers.
 - **Buyer Inquiries & Direct Connect**: Wholesale, custom order, and direct retail purchase requests linked to artisans.
 - **Digital Product Passport (DPP)**: Immutable craft identity passport linked to physical items via QR verification.
@@ -161,9 +161,22 @@ curl -X POST http://localhost:8000/api/pricing/calculate \
     "labour_cost": 600,
     "production_days": 3,
     "packaging_cost": 100,
-    "market_demand": "medium"
+    "market_demand": "medium",
+    "category": "Bamboo Craft",
+    "region": "Assam",
+    "artisan_experience_years": 18
   }'
 ```
+`category`, `region` and `artisan_experience_years` are optional but improve the ML
+model's accuracy — omit them and it falls back to sensible defaults. The response
+includes `model_used: true/false` and `model_type` so it's always visible whether the
+number came from the trained model or the fallback formula.
+
+**Retraining on new data:** run `python backend/ml/generate_pricing_dataset.py` then
+`python backend/ml/train_pricing_model.py` to regenerate the seed dataset and retrain.
+As real transactions accumulate, append them to `backend/data/pricing_dataset.csv`
+(same columns) before retraining — that turns this from a seed dataset into a dataset
+built from CRAFTORA's real usage.
 
 ### 2. Buyer Matching
 ```bash

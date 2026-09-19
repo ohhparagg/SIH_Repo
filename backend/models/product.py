@@ -195,6 +195,8 @@ class ProductResponse(ProductBase):
     imageUrl: Optional[str] = None
     productionTimeDays: Optional[int] = None
     passportAvailable: bool = True
+    passport: Optional[Dict[str, Any]] = None
+    provenance_hash: Optional[str] = None
     blockchainRecord: Optional[BlockchainRecord] = None
     costBreakdown: Optional[CostBreakdown] = None
     aiInsight: Optional[AIInsight] = None

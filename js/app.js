@@ -69,6 +69,36 @@ function renderApp() {
   `;
 }
 
+// Global Transaction & Async Error Handler to prevent raw popups
+window.addEventListener('unhandledrejection', (event) => {
+  const reason = event?.reason;
+  const msg = reason?.message || String(reason || 'Unknown error');
+  const code = reason?.code || '';
+  console.warn('⚡ Transaction async event notice:', reason);
+
+  const isPerm = msg.toLowerCase().includes('permission') ||
+                 msg.toLowerCase().includes('insufficient') ||
+                 code === 'permission-denied';
+
+  if (isPerm) {
+    event.preventDefault?.();
+    if (typeof window.showAppToast === 'function') {
+      window.showAppToast({
+        type: 'warning',
+        title: '🔥 Firebase Security Rules Denied',
+        message: 'Transaction was rejected by Firebase (Missing or insufficient permissions). Data saved locally. Click below to unlock rules.',
+        actionLabel: 'Unlock Rules',
+        onAction: () => {
+          if (typeof window.showFirebaseRulesModal === 'function') {
+            window.showFirebaseRulesModal();
+          }
+        },
+        duration: 9000
+      });
+    }
+  }
+});
+
 // Initial render & Subscribe to state changes
 document.addEventListener('DOMContentLoaded', () => {
   renderApp();

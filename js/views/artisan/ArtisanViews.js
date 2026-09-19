@@ -219,14 +219,14 @@ function renderScreen2_MobileInput() {
   return `
     <div style="padding: 24px 20px; text-align: center;">
       <div style="font-size: 11px; font-weight: 800; letter-spacing: 0.12em; color: var(--text-copper); text-transform: uppercase; margin-bottom: 6px;">
-        ARTISAN ONBOARDING · AUTHENTICATION
+        ARTISAN ONBOARDING · EMAIL OTP AUTHENTICATION
       </div>
       <h2 style="font-size: 22px; margin-bottom: 6px; font-weight: 800;">Welcome, Artisan 👋</h2>
       <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 18px;">
-        ${isSignIn ? 'Sign in to access your registered craft business.' : 'Register your craft business on CRAFTORA.'}
+        ${isSignIn ? 'Sign in with your registered email to access your artisan dashboard.' : 'Register your craft business with email verification.'}
       </p>
 
-      <!-- Clear Distinct Auth Mode Options -->
+      <!-- Auth Mode Options -->
       <div style="display: flex; gap: 8px; max-width: 340px; margin: 0 auto 16px; background: var(--bg-elevated); padding: 4px; border-radius: var(--radius-md); border: 1.5px solid var(--border-light);">
         <button type="button" class="${isSignIn ? 'btn-primary' : 'btn-secondary'}"
                 style="flex: 1; padding: 8px 10px; font-size: 12px; font-weight: 700; ${isSignIn ? 'background: var(--green); border-color: var(--green);' : ''}"
@@ -236,55 +236,47 @@ function renderScreen2_MobileInput() {
         <button type="button" class="${!isSignIn ? 'btn-primary' : 'btn-secondary'}"
                 style="flex: 1; padding: 8px 10px; font-size: 12px; font-weight: 700; ${!isSignIn ? 'background: var(--green); border-color: var(--green);' : ''}"
                 onclick="window.setArtisanAuthMode('register')">
-          ${renderIcon('plus', '', 14)} Create New Account / Register
+          ${renderIcon('plus', '', 14)} Register
         </button>
       </div>
 
       <div class="craft-card" style="text-align: left; max-width: 340px; margin: 0 auto 20px;">
-        <div id="artisan_mobile_error" style="display:none; padding:8px 10px; background:var(--danger-pale); border:1px solid var(--danger); border-radius:var(--radius-sm); color:var(--danger); font-size:12px; margin-bottom:12px; font-weight:600;"></div>
+        <div id="artisan_auth_error" style="display:none; padding:8px 10px; background:var(--danger-pale); border:1px solid var(--danger); border-radius:var(--radius-sm); color:var(--danger); font-size:12px; margin-bottom:12px; font-weight:600;"></div>
+
+        ${!isSignIn ? `
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" id="artisan_name_draft" class="form-input"
+                   value="${draft.name || ''}" placeholder="e.g. Ramesh Kumar" style="font-size: 14px;">
+          </div>
+        ` : ''}
 
         <div class="form-group">
-          <label class="form-label">${isSignIn ? 'Registered Mobile Number' : 'Mobile Number'}</label>
-          <div style="display: flex; gap: 8px;">
-            <span style="display: flex; align-items: center; padding: 10px 12px; background: var(--bg-elevated); border: 1.5px solid var(--border-light); border-radius: var(--radius-sm); font-size: 14px; font-weight: 700; color: var(--text-primary);">
-              🇮🇳 +91
-            </span>
-            <input type="tel" id="artisan_mobile_input" class="form-input" maxlength="15"
-                   value="${draft.mobileNumber || (isSignIn ? '9876543210' : '')}" placeholder="10-digit number" style="font-size: 15px; letter-spacing: 0.05em; font-weight: 600;">
-          </div>
+          <label class="form-label">Email Address</label>
+          <input type="email" id="artisan_email_input" class="form-input"
+                 value="${draft.email || (isSignIn ? 'ramesh.artisan@craftora.in' : '')}"
+                 placeholder="name@example.com" style="font-size: 14px;">
         </div>
 
-        ${isSignIn ? `
-          <div class="notice-box" style="margin-bottom: 14px; font-size: 11px;">
-            ${renderIcon('sparkles', '', 13)}
-            <div>
-              <strong>Demo Existing Artisans:</strong><br>
-              • 9876543210 (Ramesh Kumar · Bamboo Craft)<br>
-              • 9876543211 (Meera Devi · Madhubani Painting)<br>
-              • 9876543212 (Harpreet Singh · Phulkari)
-            </div>
-          </div>
-        ` : `
-          <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 16px; display: flex; align-items: center; gap: 6px;">
-            ${renderIcon('shield', '', 14)} Secure registration. Demo OTP (1234) provided.
-          </div>
-        `}
+        <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 16px; display: flex; align-items: center; gap: 6px;">
+          ${renderIcon('shield', '', 14)} A secure 6-digit OTP will be dispatched to your email.
+        </div>
 
-        <button class="btn-primary" onclick="window.submitArtisanMobile()">
-          ${isSignIn ? 'Sign In with Demo OTP' : 'Continue with Mobile & Register'} ${renderIcon('arrowRight', '', 16)}
+        <button id="btn_send_artisan_otp" class="btn-primary" onclick="window.submitArtisanEmailOTP()">
+          Send Email Verification Code ${renderIcon('arrowRight', '', 16)}
         </button>
       </div>
 
       <div style="display: flex; flex-direction: column; gap: 10px; max-width: 320px; margin: 0 auto;">
         ${!isSignIn ? `
           <button class="btn-voice" onclick="window.openVoiceAssistantProfile()">
-            ${renderIcon('mic', '', 16)} Or register using Voice Assistant
+            ${renderIcon('mic', '', 16)} Register using Voice Assistant
           </button>
         ` : ''}
 
         <div style="font-size: 12px; color: var(--text-muted); margin-top: 6px;">
           ${isSignIn ? `
-            New artisan? <a href="#" onclick="window.setArtisanAuthMode('register'); return false;" style="color: var(--copper); text-decoration: underline; font-weight: 600;">Create New Account / Register</a>
+            New artisan? <a href="#" onclick="window.setArtisanAuthMode('register'); return false;" style="color: var(--copper); text-decoration: underline; font-weight: 600;">Register Here</a>
           ` : `
             Already registered? <a href="#" onclick="window.setArtisanAuthMode('signin'); return false;" style="color: var(--copper); text-decoration: underline; font-weight: 600;">Sign In</a>
           `}
@@ -294,43 +286,43 @@ function renderScreen2_MobileInput() {
   `;
 }
 
-// Screen 2B — Demo OTP Verification
+// Screen 2B — Real Email OTP Verification
 function renderScreen2_DemoOTP() {
   const draft = appState.data.onboardingDraft || {};
-  const phone = draft.mobileNumber || '9876543210';
+  const email = draft.email || 'artisan@craftora.in';
   const isSignIn = draft.authMode === 'signin';
 
   return `
     <div style="padding: 24px 20px; text-align: center;">
       <div style="font-size: 11px; font-weight: 800; letter-spacing: 0.12em; color: var(--text-copper); text-transform: uppercase; margin-bottom: 6px;">
-        ARTISAN ONBOARDING · STEP 2 OF 3
+        ARTISAN ONBOARDING · EMAIL VERIFICATION
       </div>
-      <h2 style="font-size: 22px; margin-bottom: 6px; font-weight: 800;">${isSignIn ? 'Sign In Verification' : 'Verify Mobile Number'}</h2>
+      <h2 style="font-size: 22px; margin-bottom: 6px; font-weight: 800;">Verify Your Email</h2>
       <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px;">
-        Enter the 4-digit demo OTP sent to <strong>+91 ${phone}</strong>
+        Enter the 6-digit verification code sent to <strong>${email}</strong>
       </p>
 
       <div class="craft-card" style="text-align: left; max-width: 340px; margin: 0 auto 20px;">
-        <div id="artisan_otp_error" style="display:none; padding:8px 10px; background:var(--danger-pale); border:1px solid var(--danger); border-radius:var(--radius-sm); color:var(--danger); font-size:12px; margin-bottom:12px;"></div>
+        <div id="artisan_otp_error" style="display:none; padding:8px 10px; background:var(--danger-pale); border:1px solid var(--danger); border-radius:var(--radius-sm); color:var(--danger); font-size:12px; margin-bottom:12px; font-weight:600;"></div>
 
         <div class="form-group" style="text-align: center;">
-          <label class="form-label" style="text-align: center;">Enter 4-Digit OTP</label>
-          <input type="text" id="artisan_otp_input" class="form-input" maxlength="4" value="1234"
-                 style="text-align: center; font-size: 24px; font-weight: 800; letter-spacing: 0.4em; width: 180px; margin: 0 auto; color: var(--green);">
+          <label class="form-label" style="text-align: center;">Enter 6-Digit Code</label>
+          <input type="text" id="artisan_otp_input" class="form-input" maxlength="6" placeholder="••••••"
+                 style="text-align: center; font-size: 22px; font-weight: 800; letter-spacing: 0.3em; width: 200px; margin: 0 auto; color: var(--green);">
         </div>
 
-        <div class="notice-box" style="margin-bottom: 16px; font-size: 12px; text-align: left;">
-          ${renderIcon('sparkles', '', 14)}
-          <div><strong>Demo Mode Active:</strong><br>Use OTP <strong>1234</strong> to simulate instant verification.</div>
+        <div class="notice-box" style="margin-bottom: 16px; font-size: 11px; text-align: left;">
+          ${renderIcon('shield', '', 14)}
+          <div><strong>Secure Code:</strong> Valid for 5 minutes. Check your inbox or server logs.</div>
         </div>
 
-        <button class="btn-primary" onclick="window.verifyArtisanOTP()">
-          ${isSignIn ? 'Sign In & Enter Dashboard' : 'Verify & Continue'} ${renderIcon('arrowRight', '', 16)}
+        <button id="btn_verify_artisan_otp" class="btn-primary" onclick="window.verifyArtisanEmailOTP()">
+          Verify Code & Proceed ${renderIcon('arrowRight', '', 16)}
         </button>
       </div>
 
       <div style="font-size: 12px; color: var(--text-muted);">
-        Didn't receive code? <a href="#" onclick="alert('Demo OTP is 1234'); return false;" style="color: var(--copper); font-weight: 600;">Resend OTP</a> • <a href="#" onclick="window.navArtisan('onboarding'); return false;" style="color: var(--text-secondary);">Change Number</a>
+        Didn't receive code? <a href="#" id="artisan_resend_link" onclick="window.resendArtisanOTP(); return false;" style="color: var(--copper); font-weight: 600;">Resend Code</a> • <a href="#" onclick="window.navArtisan('onboarding'); return false;" style="color: var(--text-secondary);">Change Email</a>
       </div>
     </div>
   `;
@@ -369,12 +361,23 @@ function renderScreen3_ProfileSetup() {
       </div>
 
       <div class="form-group">
-        <label class="form-label">Full Name</label>
-        <input type="text" id="artisan_name_input" class="form-input" value="${draft.name || ''}" placeholder="Enter your name">
+        <label class="form-label">Full Name *</label>
+        <input type="text" id="artisan_name_input" class="form-input" value="${draft.name || ''}" placeholder="Enter your full name">
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div class="form-group">
+          <label class="form-label">Email Address *</label>
+          <input type="email" id="artisan_email_input" class="form-input" value="${draft.email || ''}" placeholder="artisan@example.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <input type="tel" id="artisan_phone_input" class="form-input" value="${draft.mobileNumber || ''}" placeholder="10-digit mobile">
+        </div>
       </div>
 
       <div class="form-group">
-        <label class="form-label">Primary Craft Category</label>
+        <label class="form-label">Primary Craft Category *</label>
         <select id="artisan_craft_select" class="form-select">
           <option value="" disabled ${!draft.craftCategory ? 'selected' : ''}>Select your craft</option>
           <option value="Bamboo Craft" ${draft.craftCategory === 'Bamboo Craft' ? 'selected' : ''}>Bamboo Craft (Assam)</option>
@@ -383,29 +386,47 @@ function renderScreen3_ProfileSetup() {
           <option value="Phulkari Embroidery" ${draft.craftCategory === 'Phulkari Embroidery' ? 'selected' : ''}>Phulkari Embroidery (Punjab)</option>
           <option value="Banarasi Weaving" ${draft.craftCategory === 'Banarasi Weaving' ? 'selected' : ''}>Banarasi Weaving (Varanasi, UP)</option>
           <option value="Terracotta Clay Work" ${draft.craftCategory === 'Terracotta Clay Work' ? 'selected' : ''}>Terracotta Clay Work (Bankura, West Bengal)</option>
+          <option value="Wood Carving" ${draft.craftCategory === 'Wood Carving' ? 'selected' : ''}>Wood Carving (Saharanpur, UP)</option>
         </select>
       </div>
 
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+        <div class="form-group">
+          <label class="form-label">State *</label>
+          <input type="text" id="artisan_state_select" class="form-input" value="${draft.state || 'Assam'}" placeholder="State">
+        </div>
+        <div class="form-group">
+          <label class="form-label">District</label>
+          <input type="text" id="artisan_district_input" class="form-input" value="${draft.district || 'Nalbari'}" placeholder="District">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Village / Town</label>
+          <input type="text" id="artisan_village_input" class="form-input" value="${draft.village || 'Sariha'}" placeholder="Village">
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 10px;">
+        <div class="form-group">
+          <label class="form-label">Experience (Yrs)</label>
+          <input type="number" id="artisan_experience_input" class="form-input" value="${draft.experience || 12}" min="1" max="70">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Key Craft Skills</label>
+          <input type="text" id="artisan_skills_input" class="form-input" value="${draft.skills || 'Lattice weaving, Cane splitting'}" placeholder="Comma separated">
+        </div>
+      </div>
+
       <div class="form-group">
-        <label class="form-label">Workshop Location</label>
-        <input type="text" id="artisan_location_input" class="form-input" value="${draft.location || ''}" placeholder="Enter your location">
+        <label class="form-label">Artisan Bio / Heritage Story</label>
+        <textarea id="artisan_bio_input" class="form-input" rows="2" placeholder="Tell buyers about your lineage and craft background...">${draft.bio || 'Master craftsman preserving indigenous handmade techniques.'}</textarea>
       </div>
 
       <button class="btn-voice" style="margin-bottom: 16px;" onclick="window.openVoiceAssistantProfile()">
         ${renderIcon('mic', '', 18)} Speak by Voice (English / हिन्दी)
       </button>
 
-      <!-- Explicit Aadhaar-free compliance note -->
-      <div class="disclaimer-box" style="margin-bottom: 16px;">
-        <span>${renderIcon('shield', '', 15)}</span>
-        <div>
-          <strong>Document-Free Digital Verification:</strong><br>
-          CRAFTORA uses OTP authentication and peer review. No physical Aadhaar card images or biometric files are collected or stored.
-        </div>
-      </div>
-
       <button class="btn-primary" onclick="window.completeProfileSetup()">
-        Generate CRAFTORA Identity ${renderIcon('arrowRight', '', 16)}
+        Complete Profile & Unlock Dashboard ${renderIcon('arrowRight', '', 16)}
       </button>
     </div>
   `;
@@ -765,7 +786,7 @@ function renderScreen6_AIAnalysis() {
   return `
     <div style="padding: 24px 20px; text-align: center;">
       <h2 style="font-size: 20px; margin-bottom: 4px; color: var(--copper); display: flex; align-items: center; justify-content: center; gap: 8px;">
-        ${renderIcon('sparkles', '', 20)} AI Generated — Review Before Publishing
+        ${renderIcon('sparkles', '', 20)} AI Suggested — Review & Edit
       </h2>
       <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 14px;">
         AI Generated — Review Before Publishing
@@ -1433,62 +1454,164 @@ window.setArtisanAuthMode = (mode) => {
   appState.notify();
 };
 
-window.submitArtisanMobile = (mode) => {
-  const phone = (typeof document !== 'undefined' ? document.getElementById('artisan_mobile_input')?.value?.trim() : '') || appState.data.onboardingDraft?.mobileNumber || '';
-  const errEl = typeof document !== 'undefined' ? document.getElementById('artisan_mobile_error') : null;
-  if (!/^[0-9]{10}$/.test(phone)) {
+window.submitArtisanEmailOTP = async (mode) => {
+  const email = (typeof document !== 'undefined' ? document.getElementById('artisan_email_input')?.value?.trim() : '') || appState.data.onboardingDraft?.email || '';
+  const name = (typeof document !== 'undefined' ? document.getElementById('artisan_name_draft')?.value?.trim() : '') || appState.data.onboardingDraft?.name || '';
+  const errEl = typeof document !== 'undefined' ? document.getElementById('artisan_auth_error') : null;
+  const btn = typeof document !== 'undefined' ? document.getElementById('btn_send_artisan_otp') : null;
+
+  if (!email || !email.includes('@') || !email.includes('.')) {
     if (errEl) {
       errEl.style.display = 'block';
-      errEl.textContent = 'Enter a valid 10-digit mobile number.';
+      errEl.textContent = 'Please enter a valid email address.';
     } else if (typeof alert === 'function') {
-      alert('Enter a valid 10-digit mobile number.');
+      alert('Please enter a valid email address.');
     }
     return;
   }
   if (errEl) errEl.style.display = 'none';
 
   if (!appState.data.onboardingDraft) appState.data.onboardingDraft = {};
-  appState.data.onboardingDraft.mobileNumber = phone;
+  appState.data.onboardingDraft.email = email;
+  appState.data.onboardingDraft.name = name;
   if (mode) appState.data.onboardingDraft.authMode = mode;
-  appState.setArtisanScreen('onboarding_otp');
-};
 
-window.verifyArtisanOTP = () => {
-  const otp = document.getElementById('artisan_otp_input')?.value?.trim() || '1234';
-  const errEl = document.getElementById('artisan_otp_error');
-  if (otp.length !== 4) {
+  const authMode = appState.data.onboardingDraft.authMode || 'register';
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Sending code...';
+  }
+
+  const res = await apiService.sendOTP(email, 'artisan', name, authMode);
+  if (btn) {
+    btn.disabled = false;
+    btn.textContent = 'Send Email Verification Code →';
+  }
+
+  if (!res.success) {
     if (errEl) {
       errEl.style.display = 'block';
-      errEl.textContent = 'Please enter a 4-digit OTP (Demo OTP: 1234)';
+      errEl.textContent = res.message || 'Could not send verification code.';
     } else {
-      alert('Please enter a 4-digit OTP (Demo OTP: 1234)');
+      alert(res.message || 'Could not send verification code.');
     }
     return;
   }
-  if (!appState.data.onboardingDraft) appState.data.onboardingDraft = {};
-  appState.data.onboardingDraft.otp = otp;
 
-  if (appState.data.onboardingDraft?.authMode === 'signin') {
-    const mobile = appState.data.onboardingDraft?.mobileNumber || '9876543210';
-    appState.loginReturningArtisan(mobile);
-  } else {
+  appState.setArtisanScreen('onboarding_otp');
+};
+
+window.submitArtisanMobile = window.submitArtisanEmailOTP;
+
+window.verifyArtisanEmailOTP = async () => {
+  const email = appState.data.onboardingDraft?.email || 'ramesh.artisan@craftora.in';
+  const otp = document.getElementById('artisan_otp_input')?.value?.trim() || '';
+  const errEl = document.getElementById('artisan_otp_error');
+  const btn = document.getElementById('btn_verify_artisan_otp');
+
+  if (!otp || otp.length < 4) {
+    if (errEl) {
+      errEl.style.display = 'block';
+      errEl.textContent = 'Please enter the verification code sent to your email.';
+    } else {
+      alert('Please enter the verification code sent to your email.');
+    }
+    return;
+  }
+  if (errEl) errEl.style.display = 'none';
+
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Verifying...';
+  }
+
+  const res = await apiService.verifyOTP(email, otp, 'artisan');
+  if (btn) {
+    btn.disabled = false;
+    btn.textContent = 'Verify Code & Proceed →';
+  }
+
+  if (!res.success) {
+    if (errEl) {
+      errEl.style.display = 'block';
+      errEl.textContent = res.message || 'Verification failed. Please check the code.';
+    } else {
+      alert(res.message || 'Verification failed. Please check the code.');
+    }
+    return;
+  }
+
+  // Verification succeeded
+  if (!appState.data.artisanAuth) appState.data.artisanAuth = {};
+  appState.data.artisanAuth.isRegistered = true;
+  appState.data.artisanAuth.email = email;
+  appState.data.artisanAuth.token = res.token;
+  appState.data.artisanAuth.profileCompleted = Boolean(res.profileCompleted);
+
+  if (res.user) {
+    appState.data.selectedArtisanId = res.user.uid;
+    appState.data.artisanAuth.artisanProfile = {
+      id: res.user.uid,
+      name: res.user.name,
+      email: res.user.email,
+      profileCompleted: res.profileCompleted
+    };
+  }
+
+  // Profile completion gate:
+  // If profile is not complete, redirect to setup profile (profile_step1)
+  if (!res.profileCompleted) {
     appState.setArtisanScreen('profile_step1');
+  } else {
+    appState.setArtisanScreen('dashboard');
+  }
+};
+
+window.verifyArtisanOTP = window.verifyArtisanEmailOTP;
+
+window.resendArtisanOTP = async () => {
+  const email = appState.data.onboardingDraft?.email || '';
+  const name = appState.data.onboardingDraft?.name || '';
+  const authMode = appState.data.onboardingDraft?.authMode || 'register';
+  const link = document.getElementById('artisan_resend_link');
+  if (link) link.textContent = 'Sending...';
+
+  const res = await apiService.sendOTP(email, 'artisan', name, authMode);
+  if (res.success) {
+    alert('A new verification code has been dispatched to ' + email);
+    if (link) link.textContent = 'Resend Code';
+  } else {
+    alert(res.message || 'Could not resend OTP. Please wait before trying again.');
+    if (link) link.textContent = 'Resend Code';
   }
 };
 
 window.completeProfileSetup = () => {
-  const nameVal = document.getElementById('artisan_name_input')?.value?.trim() || '';
-  const craftVal = document.getElementById('artisan_craft_select')?.value || '';
-  const locVal = document.getElementById('artisan_location_input')?.value?.trim() || '';
-  const phone = appState.data.onboardingDraft?.mobileNumber || '9876543210';
+  const nameVal = document.getElementById('artisan_name_input')?.value?.trim() || 'Master Artisan';
+  const emailVal = document.getElementById('artisan_email_input')?.value?.trim() || appState.data.artisanAuth?.email || '';
+  const phoneVal = document.getElementById('artisan_phone_input')?.value?.trim() || '';
+  const craftVal = document.getElementById('artisan_craft_select')?.value || 'Bamboo Craft';
+  const stateVal = document.getElementById('artisan_state_select')?.value?.trim() || 'Assam';
+  const distVal = document.getElementById('artisan_district_input')?.value?.trim() || '';
+  const villVal = document.getElementById('artisan_village_input')?.value?.trim() || '';
+  const expVal = parseInt(document.getElementById('artisan_experience_input')?.value) || 5;
+  const skillsVal = (document.getElementById('artisan_skills_input')?.value?.trim() || craftVal).split(',').map(s => s.trim());
+  const bioVal = document.getElementById('artisan_bio_input')?.value?.trim() || '';
 
-  appState.completeArtisanRegistration(nameVal, craftVal, locVal, phone);
-
-  apiService.createArtisan({
+  const profileData = {
     name: nameVal,
+    email: emailVal,
+    phone: phoneVal,
     craft: craftVal,
-    location: locVal
-  }).catch(err => console.warn('Artisan registration sync warning:', err));
+    state: stateVal,
+    district: distVal,
+    village: villVal,
+    experience: expVal,
+    skills: skillsVal,
+    bio: bioVal
+  };
+
+  appState.completeArtisanProfileSetup(profileData);
 };
 
 window.loginAsReturningArtisan = () => {

@@ -140,17 +140,18 @@ service cloud.firestore {
 
         <div style="position: relative; background: #1C2A23; border-radius: 8px; padding: 12px; margin-bottom: 14px;">
           <pre style="margin: 0; font-family: monospace; font-size: 11px; color: #D4E9DC; overflow-x: auto;"><code>${rulesSnippet}</code></pre>
-          <button onclick="navigator.clipboard.writeText(\`${rulesSnippet}\`); alert('Copied rules to clipboard!');"
+          <button id="copy-firebase-rules-btn"
+                  onclick="navigator.clipboard.writeText(\`${rulesSnippet}\`); this.textContent = '✓ Copied!'; setTimeout(() => this.textContent = '📋 Copy Rules', 2000); if (window.showAppToast) window.showAppToast({ type: 'success', title: 'Rules Copied', message: 'Paste into Firebase Console and click Publish.', duration: 4000 });"
                   style="position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.15);
                          border: 1px solid rgba(255,255,255,0.25); color: white; border-radius: 4px;
-                         padding: 3px 8px; font-size: 10px; cursor: pointer;">
+                         padding: 4px 10px; font-size: 11px; cursor: pointer; font-weight: 600;">
             📋 Copy Rules
           </button>
         </div>
 
         <div style="display: flex; gap: 10px;">
-          <a href="https://console.firebase.google.com/project/sihdatabaase/firestore/rules" target="_blank"
-             class="btn-primary" style="flex: 1; text-align: center; text-decoration: none; font-size: 12px; padding: 10px;">
+          <a href="https://console.firebase.google.com/project/sihdatabaase/firestore/rules" target="_blank" rel="noopener noreferrer"
+             class="btn-primary" style="flex: 1; text-align: center; text-decoration: none; font-size: 12px; padding: 10px; display: inline-flex; align-items: center; justify-content: center; gap: 6px;">
             Open Firebase Console ↗
           </a>
           <button class="btn-secondary" onclick="document.getElementById('firebase-rules-overlay').remove()"

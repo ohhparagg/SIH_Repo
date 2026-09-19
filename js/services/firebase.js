@@ -83,32 +83,44 @@ class FirebaseService {
   // ── Centralized Error Handler ─────────────────────────────────────────
   handleFirebaseError(error, context = 'operation') {
     const msg = error?.message || String(error);
-    console.warn(`Firestore [${context}] notice:`, msg);
+    const code = error?.code || '';
+    console.warn(`Firestore [${context}] notice:`, error);
 
-    const isPermissionError = msg.includes('permission') || msg.includes('insufficient') || error?.code === 'permission-denied';
+    const isPermissionError = msg.toLowerCase().includes('permission') ||
+                              msg.toLowerCase().includes('insufficient') ||
+                              code === 'permission-denied';
+
+    const isWriteAction = context.includes('save') ||
+                          context.includes('update') ||
+                          context.includes('delete') ||
+                          context.includes('add') ||
+                          context.includes('seed') ||
+                          context.includes('create') ||
+                          context.includes('Inquiry');
 
     if (isPermissionError) {
-      if (!this.hasNotifiedPermission) {
+      // Always show for user-initiated write transactions or first-time read error
+      if (isWriteAction || !this.hasNotifiedPermission) {
         this.hasNotifiedPermission = true;
         showAppToast({
           type: 'warning',
-          title: '🔥 Firebase Security Rules Locked',
-          message: 'Firestore on sihdatabaase rejected write/read (Missing permissions). Your record was saved locally and on the backend. Click below to enable rules in 1 click.',
+          title: '🔥 Firebase Firestore Rules Locked',
+          message: `Firestore rejected [${context}]: Missing or insufficient permissions. Your record was preserved in local memory and backend. Click below to unlock Firestore rules.`,
           actionLabel: 'Fix Rules (1-Click)',
           onAction: () => {
             if (typeof window !== 'undefined' && window.showFirebaseRulesModal) {
               window.showFirebaseRulesModal();
             }
           },
-          duration: 9000
+          duration: 10000
         });
       }
-    } else if (context.includes('save') || context.includes('update') || context.includes('Inquiry')) {
+    } else if (isWriteAction) {
       showAppToast({
         type: 'error',
-        title: 'Cloud Transaction Notice',
-        message: `Cloud sync encountered an issue (${msg}). Local and backend data preserved.`,
-        duration: 5000
+        title: 'Cloud Transaction Alert',
+        message: `Cloud transaction failed for [${context}]: ${msg}. Local and backend data remain safe.`,
+        duration: 6000
       });
     }
   }

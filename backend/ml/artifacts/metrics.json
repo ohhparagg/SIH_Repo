@@ -1,0 +1,14 @@
+{
+  "n_rows_total": 560,
+  "n_train": 448,
+  "n_test": 112,
+  "random_forest": {
+    "mae_inr": 216.06,
+    "mape_pct": 10.17,
+    "r2": 0.9498
+  },
+  "old_fixed_multiplier_formula": {
+    "mae_inr": 415.84,
+    "mape_pct": 15.1
+  }
+}

@@ -25,6 +25,8 @@ def _hydrate_product_response(prod_dict: dict) -> ProductResponse:
     for pid, pass_data in PASSPORTS.items():
         if pass_data.get("product_id") == prod_dict.get("product_id"):
             enriched["passportAvailable"] = True
+            enriched["passport"] = pass_data
+            enriched["provenance_hash"] = pass_data.get("provenance_hash")
             evts = PROVENANCE_EVENTS.get(pid, [])
             enriched["blockchainRecord"] = BlockchainRecord(
                 network="Polygon Testnet Demo",
@@ -61,24 +63,11 @@ def create_product(product_in: ProductCreate):
                     detail=f"Invalid artisan_id '{product_in.artisan_id}'. Artisan must be registered first."
                 )
 
-        # 2. Determine Product ID
+        # 2. Determine Product ID (Collision-Resistant Globally Unique Identifier)
         product_id = product_in.product_id
         if not product_id:
-            category_prefix = "CRF"
-            cat_lower = product_in.category.lower()
-            if "bamboo" in cat_lower:
-                category_prefix = "CRF-BAM"
-            elif "pottery" in cat_lower:
-                category_prefix = "CRF-POT"
-            elif "madhubani" in cat_lower or "painting" in cat_lower:
-                category_prefix = "CRF-MAD"
-            elif "textile" in cat_lower or "weaving" in cat_lower:
-                category_prefix = "CRF-WEA"
-            else:
-                category_prefix = "CRF-CRF"
-            
-            seq = len(PRODUCTS) + 1
-            product_id = f"{category_prefix}-{seq:06d}"
+            import secrets
+            product_id = f"CRAFTORA-2026-{secrets.token_hex(4).upper()}"
 
         if product_id in PRODUCTS:
             raise HTTPException(

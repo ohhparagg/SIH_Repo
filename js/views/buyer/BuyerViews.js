@@ -4,6 +4,7 @@
    ========================================================================== */
 
 import { appState } from '../../state.js';
+import { apiService } from '../../services/api.js';
 import { renderDigitalProductPassportCard } from '../../components/DigitalProductPassportCard.js';
 import { renderQRScannerModal } from '../../components/QRScannerModal.js';
 import { renderIcon } from '../../components/Icons.js';
@@ -142,84 +143,82 @@ function renderScreen2B_BuyerMobile() {
   return `
     <div style="padding: 24px 20px; text-align: center;">
       <div style="font-size: 11px; font-weight: 800; letter-spacing: 0.12em; color: var(--text-copper); text-transform: uppercase; margin-bottom: 6px;">
-        BUYER AUTHENTICATION · STEP 1 OF 3
+        BUYER AUTHENTICATION · EMAIL VERIFICATION
       </div>
-      <h2 style="font-size: 22px; margin-bottom: 6px; font-weight: 800;">Enter Mobile Number</h2>
+      <h2 style="font-size: 22px; margin-bottom: 6px; font-weight: 800;">Welcome, Craft Enthusiast</h2>
       <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 24px;">
-        We'll send a 4-digit demo OTP to verify your account.
+        Enter your email to receive a secure 6-digit verification code.
       </p>
 
       <div class="craft-card" style="text-align: left; max-width: 340px; margin: 0 auto 20px;">
-        <div id="buyer_mobile_error" style="display:none; padding:8px 10px; background:var(--danger-pale); border:1px solid var(--danger); border-radius:var(--radius-sm); color:var(--danger); font-size:12px; margin-bottom:12px; font-weight:600;"></div>
+        <div id="buyer_auth_error" style="display:none; padding:8px 10px; background:var(--danger-pale); border:1px solid var(--danger); border-radius:var(--radius-sm); color:var(--danger); font-size:12px; margin-bottom:12px; font-weight:600;"></div>
 
         <div class="form-group">
-          <label class="form-label">Mobile Number</label>
-          <div style="display: flex; gap: 8px;">
-            <span style="display: flex; align-items: center; padding: 10px 12px; background: var(--bg-elevated); border: 1.5px solid var(--border-light); border-radius: var(--radius-sm); font-size: 14px; font-weight: 700; color: var(--text-primary);">
-              🇮🇳 +91
-            </span>
-            <input type="tel" id="buyer_mobile_input" class="form-input" maxlength="15"
-                   value="${draft.mobileNumber || ''}" placeholder="10-digit number" style="font-size: 15px; letter-spacing: 0.05em; font-weight: 600;">
-          </div>
+          <label class="form-label">Full Name</label>
+          <input type="text" id="buyer_name_input" class="form-input"
+                 value="${draft.name || ''}" placeholder="e.g. Arjun Sharma" style="font-size: 14px;">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" id="buyer_email_input" class="form-input"
+                 value="${draft.email || 'arjun.buyer@craftora.in'}" placeholder="buyer@example.com" style="font-size: 14px;">
         </div>
 
         <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 16px; display: flex; align-items: center; gap: 6px;">
-          ${renderIcon('shield', '', 14)} Secure verification. Demo OTP (1234) provided.
+          ${renderIcon('shield', '', 14)} Secure 6-digit OTP will be dispatched to your email.
         </div>
 
-        <button class="btn-primary" onclick="window.submitBuyerMobile()">
-          Send Demo OTP ${renderIcon('arrowRight', '', 16)}
+        <button id="btn_send_buyer_otp" class="btn-primary" onclick="window.submitBuyerEmailOTP()">
+          Send Email Verification Code ${renderIcon('arrowRight', '', 16)}
         </button>
       </div>
 
       <div style="display: flex; flex-direction: column; gap: 10px; max-width: 320px; margin: 0 auto;">
         <div style="font-size: 12px; color: var(--text-muted);">
-          Already registered? <a href="#" onclick="window.navBuyer('buyer_signin'); return false;" style="color: var(--copper); text-decoration: underline; font-weight: 600;">Sign In</a>
-        </div>
-        <div style="font-size: 12px; color: var(--text-muted);">
-          <a href="#" onclick="window.continueAsGuest(); return false;" style="color: var(--text-secondary);">Continue as Guest</a>
+          <a href="#" onclick="window.continueAsGuest(); return false;" style="color: var(--text-secondary);">Continue as Guest Explorer</a>
         </div>
       </div>
     </div>
   `;
 }
 
-// Screen 2B-3 — Buyer Demo OTP Verification
+// Screen 2B-3 — Buyer Real Email OTP Verification
 function renderScreen2B_BuyerOTP() {
   const draft = appState.data.buyerDraft || {};
-  const phone = draft.mobileNumber || '9876543210';
+  const email = draft.email || 'buyer@craftora.in';
 
   return `
     <div style="padding: 24px 20px; text-align: center;">
       <div style="font-size: 11px; font-weight: 800; letter-spacing: 0.12em; color: var(--text-copper); text-transform: uppercase; margin-bottom: 6px;">
-        BUYER AUTHENTICATION · STEP 2 OF 3
+        BUYER AUTHENTICATION · STEP 2 OF 2
       </div>
-      <h2 style="font-size: 22px; margin-bottom: 6px; font-weight: 800;">Verify Mobile Number</h2>
+      <h2 style="font-size: 22px; margin-bottom: 6px; font-weight: 800;">Verify Your Email</h2>
       <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px;">
-        Enter the 4-digit demo OTP sent to <strong>+91 ${phone}</strong>
+        Enter the 6-digit verification code sent to <strong>${email}</strong>
       </p>
 
       <div class="craft-card" style="text-align: left; max-width: 340px; margin: 0 auto 20px;">
         <div id="buyer_otp_error" style="display:none; padding:8px 10px; background:var(--danger-pale); border:1px solid var(--danger); border-radius:var(--radius-sm); color:var(--danger); font-size:12px; margin-bottom:12px;"></div>
 
         <div class="form-group" style="text-align: center;">
-          <label class="form-label" style="text-align: center;">Enter 4-Digit OTP</label>
-          <input type="text" id="buyer_otp_input" class="form-input" maxlength="4" value="1234"
-                 style="text-align: center; font-size: 24px; font-weight: 800; letter-spacing: 0.4em; width: 180px; margin: 0 auto; color: var(--green);">
+          <label class="form-label" style="text-align: center;">Enter 6-Digit Code</label>
+          <input type="text" id="buyer_otp_input" class="form-input" maxlength="6" placeholder="••••••"
+                 style="text-align: center; font-size: 22px; font-weight: 800; letter-spacing: 0.3em; width: 200px; margin: 0 auto; color: var(--green);">
         </div>
 
-        <div class="notice-box" style="margin-bottom: 16px; font-size: 12px; text-align: left;">
-          ${renderIcon('sparkles', '', 14)}
-          <div><strong>Demo Mode Active:</strong><br>Use OTP <strong>1234</strong> to simulate instant verification.</div>
+        <div class="notice-box" style="margin-bottom: 16px; font-size: 11px; text-align: left;">
+          ${renderIcon('shield', '', 14)}
+          <div><strong>Verification Code:</strong> Valid for 5 minutes. Check your email or console logs.</div>
         </div>
 
-        <button class="btn-primary" onclick="window.verifyBuyerOTP()">
-          Verify & Continue ${renderIcon('arrowRight', '', 16)}
+        <button id="btn_verify_buyer_otp" class="btn-primary" onclick="window.verifyBuyerEmailOTP()">
+          Verify Code & Enter Marketplace ${renderIcon('arrowRight', '', 16)}
         </button>
       </div>
 
       <div style="font-size: 12px; color: var(--text-muted);">
-        Didn't receive code? <a href="#" onclick="alert('Demo OTP is 1234'); return false;" style="color: var(--copper); font-weight: 600;">Resend OTP</a> • <a href="#" onclick="window.navBuyer('buyer_mobile'); return false;" style="color: var(--text-secondary);">Change Number</a>
+        Didn't receive code? <a href="#" onclick="window.submitBuyerEmailOTP(); return false;" style="color: var(--copper); font-weight: 600;">Resend Code</a> • <a href="#" onclick="window.navBuyer('buyer_mobile'); return false;" style="color: var(--text-secondary);">Change Email</a>
       </div>
     </div>
   `;
@@ -553,22 +552,60 @@ function renderScreenB4_ProductDetails(product) {
         </div>
       </div>
 
-      <!-- Demo Buyer Rating Section -->
-      <div class="craft-card" style="margin-bottom: 16px; padding: 14px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-          <h4 style="font-size: 13px; font-weight: 700;">Rate Artisan Craftsmanship</h4>
-          <span class="badge-pill badge-gold" style="font-size: 10px;">Demo Data</span>
+      <!-- Digital Provenance Passport Summary -->
+      <div class="craft-card" style="margin-bottom: 16px; background: var(--bg-elevated); border-left: 3px solid var(--green);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--green); letter-spacing: 0.05em; display:flex; align-items:center; gap:6px;">
+            ${renderIcon('shield', '', 14)} Digital Product Passport
+          </div>
+          <span class="badge-pill badge-emerald" style="font-size: 10px;">SHA-256 Verified</span>
         </div>
-        <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">
-          Leave a verified prototype rating for ${product.artisanName}:
+        <div style="font-size: 12px; margin-bottom: 4px;">
+          <strong>Product ID:</strong> <code style="font-family: monospace; color: var(--copper); font-size: 12px;">${product.id}</code>
         </div>
-        <div style="display: flex; align-items: center; gap: 8px;">
-          ${[1, 2, 3, 4, 5].map(star => `
-            <button type="button" class="btn-secondary" style="padding: 6px 12px; font-size: 12px; font-weight: 700; color: var(--gold); border-color: var(--gold);"
-                    onclick="window.submitArtisanRating('${product.artisanId}', ${star})">
-              ${star} ⭐
-            </button>
-          `).join('')}
+        <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 4px; word-break: break-all;">
+          <strong>Canonical Provenance Hash:</strong><br>
+          <code style="font-family: monospace; font-size: 10px; color: var(--text-muted);">${product.passport?.provenanceHash || product.provenanceHash || 'SHA-256 Deterministic Canonical Hash'}</code>
+        </div>
+        <div style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">
+          Tamper-evident record of craft origin, artisan identity, and material composition.
+        </div>
+      </div>
+
+      <!-- Purchase Craft Section -->
+      <div class="craft-card" style="margin-bottom: 16px; border: 1px solid var(--border-medium); padding: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <div>
+            <div style="font-size: 14px; font-weight: 800;">Order Authentic Craft</div>
+            <div style="font-size: 11px; color: var(--text-secondary);">Direct from ${product.artisanName}</div>
+          </div>
+          <div style="font-size: 18px; font-weight: 800; color: var(--copper);">₹${product.price}</div>
+        </div>
+        <button id="btn_buy_craft_now" class="btn-primary" style="width: 100%;" onclick="window.buyProductNow('${product.id}', ${product.price})">
+          ${renderIcon('store', '', 16)} Complete Purchase Now (Verified Order)
+        </button>
+      </div>
+
+      <!-- Customer Reviews & Ratings (Purchase-Gated) -->
+      <div class="craft-card" style="margin-bottom: 16px; padding: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border-light);">
+          <div>
+            <h4 style="font-size: 15px; font-weight: 800; margin: 0;">Verified Customer Reviews</h4>
+            <div id="reviews_summary_${product.id}" style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
+              Loading reviews...
+            </div>
+          </div>
+          <span class="badge-pill badge-copper" style="font-size: 10px;">Purchase-Gated</span>
+        </div>
+
+        <!-- Review List Container -->
+        <div id="reviews_list_${product.id}" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px;">
+          <div style="font-size: 12px; color: var(--text-muted); text-align: center; padding: 10px;">Loading customer feedback...</div>
+        </div>
+
+        <!-- Review Eligibility & Submission Form Container -->
+        <div id="review_eligibility_box_${product.id}" style="border-top: 1px solid var(--border-light); padding-top: 12px;">
+          <div style="font-size: 12px; color: var(--text-muted);">Checking review eligibility...</div>
         </div>
       </div>
 
@@ -589,6 +626,10 @@ function renderScreenB4_ProductDetails(product) {
           ${renderIcon('globe', '', 18)} View Digital Product Passport
         </button>
       </div>
+      
+      <script>
+        setTimeout(() => { if (window.loadProductReviews) window.loadProductReviews('${product.id}'); }, 20);
+      </script>
     </div>
   `;
 }
@@ -1058,3 +1099,200 @@ window.submitArtisanRating = (artisanId, stars) => {
     alert('Artisans cannot rate themselves.');
   }
 };
+
+window.buyProductNow = async (productId, price) => {
+  const btn = document.getElementById('btn_buy_craft_now');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerText = 'Processing Order...';
+  }
+
+  const buyer = appState.data.buyerAuth || {};
+  const buyerId = buyer.buyerId || buyer.id || 'CRF-BUY-001001';
+  const buyerName = buyer.buyerName || 'Verified Buyer';
+
+  try {
+    const res = await apiService.createOrder({
+      buyer_id: buyerId,
+      buyer_name: buyerName,
+      product_id: productId,
+      amount: price || 1200,
+      items: [{ product_id: productId, quantity: 1, price: price || 1200 }]
+    });
+
+    if (res && res.order_id) {
+      alert(`🎉 Order Completed Successfully!\nOrder ID: ${res.order_id}\nStatus: ${res.status}\n\nYou are now verified as a real purchaser of this craft and can submit an authentic review.`);
+      if (window.loadProductReviews) {
+        window.loadProductReviews(productId);
+      }
+    } else {
+      alert('Order could not be processed. Please try again.');
+    }
+  } catch (err) {
+    alert('Error connecting to order service.');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = `${renderIcon('store', '', 16)} Complete Purchase Now (Verified Order)`;
+    }
+  }
+};
+
+window.loadProductReviews = async (productId) => {
+  const summaryEl = document.getElementById(`reviews_summary_${productId}`);
+  const listEl = document.getElementById(`reviews_list_${productId}`);
+  const eligEl = document.getElementById(`review_eligibility_box_${productId}`);
+
+  if (!listEl) return;
+
+  const buyer = appState.data.buyerAuth || {};
+  const buyerId = buyer.buyerId || buyer.id || 'CRF-BUY-001001';
+
+  // 1. Fetch reviews
+  try {
+    const reviewData = await apiService.getProductReviews(productId);
+    const reviews = reviewData.reviews || [];
+    const avg = reviewData.average_rating || 0;
+    const total = reviewData.total_reviews || 0;
+
+    if (summaryEl) {
+      summaryEl.innerHTML = total > 0
+        ? `<span style="color:var(--gold); font-weight:800;">⭐ ${avg.toFixed(1)} / 5.0</span> · Based on ${total} verified ${total === 1 ? 'review' : 'reviews'}`
+        : 'No verified reviews yet. Be the first purchaser to review!';
+    }
+
+    if (reviews.length === 0) {
+      listEl.innerHTML = `
+        <div style="font-size: 12px; color: var(--text-muted); text-align: center; padding: 12px; background: var(--bg-elevated); border-radius: var(--radius-sm);">
+          No customer reviews recorded yet for this craft.
+        </div>
+      `;
+    } else {
+      listEl.innerHTML = reviews.map(r => `
+        <div style="background: var(--bg-elevated); border-radius: var(--radius-sm); padding: 10px 12px; border-left: 2px solid var(--copper);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <strong style="font-size: 12px;">${r.buyer_name || 'Verified Buyer'}</strong>
+              <span class="badge-pill badge-emerald" style="font-size: 9px; padding: 1px 6px;">✓ Verified Purchase</span>
+            </div>
+            <span style="font-size: 12px; color: var(--gold); font-weight: 700;">${'⭐'.repeat(Math.min(5, Math.max(1, r.rating)))}</span>
+          </div>
+          <p style="font-size: 12px; color: var(--text-secondary); margin: 0; line-height: 1.4;">${r.comment}</p>
+          <div style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">${new Date(r.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+        </div>
+      `).join('');
+    }
+  } catch (e) {
+    if (summaryEl) summaryEl.innerText = 'Unable to load reviews';
+  }
+
+  // 2. Check Review Eligibility
+  if (!eligEl) return;
+  try {
+    const elig = await apiService.checkReviewEligibility(productId, buyerId);
+
+    if (elig.canReview) {
+      eligEl.innerHTML = `
+        <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: var(--radius-sm); padding: 12px;">
+          <div style="font-size: 12px; font-weight: 700; color: var(--success); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+            ✓ Purchase Verified (Order: ${elig.order_id || 'Active'}) — Write a Review
+          </div>
+          <div style="margin-bottom: 8px;">
+            <label style="font-size: 11px; font-weight: 700; display: block; margin-bottom: 4px;">Your Rating</label>
+            <div style="display: flex; gap: 8px;">
+              ${[5, 4, 3, 2, 1].map(stars => `
+                <label style="font-size: 12px; display: flex; align-items: center; gap: 3px; cursor: pointer;">
+                  <input type="radio" name="review_stars_${productId}" value="${stars}" ${stars === 5 ? 'checked' : ''}>
+                  ${stars} ⭐
+                </label>
+              `).join('')}
+            </div>
+          </div>
+          <div style="margin-bottom: 10px;">
+            <label style="font-size: 11px; font-weight: 700; display: block; margin-bottom: 4px;">Your Feedback</label>
+            <textarea id="review_comment_${productId}" class="form-input" rows="2" placeholder="Share your experience with this handmade craft..." style="font-size: 12px;"></textarea>
+          </div>
+          <div id="review_error_${productId}" style="display:none; color:var(--danger); font-size:11px; margin-bottom:8px;"></div>
+          <button id="btn_submit_review_${productId}" class="btn-primary" style="font-size: 12px; padding: 8px 14px;" onclick="window.submitVerifiedReview('${productId}')">
+            Submit Verified Review
+          </button>
+        </div>
+      `;
+    } else if (elig.reason === 'ALREADY_REVIEWED') {
+      eligEl.innerHTML = `
+        <div style="font-size: 12px; color: var(--text-muted); background: var(--bg-elevated); padding: 10px 12px; border-radius: var(--radius-sm); display: flex; align-items: center; gap: 6px;">
+          <span style="color: var(--success); font-weight: bold;">✓</span> You have already submitted your verified review for this craft.
+        </div>
+      `;
+    } else {
+      eligEl.innerHTML = `
+        <div style="background: var(--bg-elevated); border: 1px dashed var(--border-medium); border-radius: var(--radius-sm); padding: 12px; text-align: center;">
+          <div style="font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">
+            🔒 Verified Purchase Required
+          </div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px;">
+            Only buyers with a confirmed completed purchase can submit reviews on CRAFTORA.
+          </div>
+          <button class="btn-secondary" style="font-size: 11px; padding: 6px 12px;" onclick="window.buyProductNow('${productId}')">
+            Purchase Craft to Unlock Review
+          </button>
+        </div>
+      `;
+    }
+  } catch (e) {
+    eligEl.innerHTML = `<div style="font-size: 11px; color: var(--text-muted);">Could not verify eligibility.</div>`;
+  }
+};
+
+window.submitVerifiedReview = async (productId) => {
+  const btn = document.getElementById(`btn_submit_review_${productId}`);
+  const errEl = document.getElementById(`review_error_${productId}`);
+  const radios = document.getElementsByName(`review_stars_${productId}`);
+  let rating = 5;
+  for (const r of radios) {
+    if (r.checked) rating = parseInt(r.value, 10);
+  }
+  const comment = document.getElementById(`review_comment_${productId}`)?.value || '';
+
+  if (!comment.trim()) {
+    if (errEl) {
+      errEl.innerText = 'Please enter a review comment.';
+      errEl.style.display = 'block';
+    }
+    return;
+  }
+
+  if (btn) {
+    btn.disabled = true;
+    btn.innerText = 'Submitting...';
+  }
+  if (errEl) errEl.style.display = 'none';
+
+  const buyer = appState.data.buyerAuth || {};
+  const buyerId = buyer.buyerId || buyer.id || 'CRF-BUY-001001';
+  const buyerName = buyer.buyerName || 'Verified Buyer';
+
+  const res = await apiService.submitProductReview(productId, {
+    rating: rating,
+    comment: comment,
+    buyer_id: buyerId,
+    buyer_name: buyerName
+  });
+
+  if (res.success) {
+    alert('Thank you! Your verified review has been published.');
+    window.loadProductReviews(productId);
+  } else {
+    if (errEl) {
+      errEl.innerText = res.message || 'Review submission failed.';
+      errEl.style.display = 'block';
+    } else {
+      alert(res.message || 'Review submission failed.');
+    }
+    if (btn) {
+      btn.disabled = false;
+      btn.innerText = 'Submit Verified Review';
+    }
+  }
+};
+

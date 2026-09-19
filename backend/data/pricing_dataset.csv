@@ -1,0 +1,561 @@
+category,region,material_cost,labour_cost,production_days,packaging_cost,artisan_experience_years,market_demand,price
+Blue Pottery,Rajasthan,452.3,1089.47,7,119.15,16,medium,2653.25
+Blue Pottery,Rajasthan,569.65,945.11,6,71.6,25,low,2464.02
+Blue Pottery,Rajasthan,340.25,1010.06,7,53.28,18,low,2046.37
+Madhubani Painting,Bihar,330.57,439.82,4,75.79,12,low,1345.34
+Phulkari,Punjab,341.31,1506.81,11,46.51,19,medium,3795.77
+Blue Pottery,Rajasthan,318.98,989.18,7,93.77,13,low,2173.94
+Bamboo Craft,Assam,247.62,82.09,1,30.93,13,low,501.08
+Madhubani Painting,Bihar,161.05,413.42,4,56.46,8,low,908.34
+Blue Pottery,Rajasthan,434.23,957.51,6,77.64,21,high,2425.54
+Blue Pottery,Rajasthan,574.54,1132.01,7,78.1,28,high,3840.59
+Madhubani Painting,Bihar,495.92,352.0,3,58.21,2,medium,1030.77
+Blue Pottery,Rajasthan,365.78,558.65,4,86.61,18,low,1691.76
+Phulkari,Punjab,754.29,874.32,5,90.25,4,medium,2850.8
+Madhubani Painting,Bihar,235.71,997.38,9,34.38,22,medium,1983.42
+Blue Pottery,Rajasthan,596.74,684.97,6,95.09,21,low,2591.82
+Madhubani Painting,Bihar,473.38,443.3,3,31.7,24,medium,1665.72
+Blue Pottery,Rajasthan,396.65,504.22,3,58.24,11,high,1857.83
+Madhubani Painting,Bihar,260.46,882.54,7,89.35,9,high,1934.19
+Bamboo Craft,Assam,191.46,414.4,3,32.85,18,high,1063.7
+Blue Pottery,Rajasthan,385.34,318.99,3,104.61,11,medium,1355.21
+Bamboo Craft,Assam,213.43,444.1,3,58.1,11,medium,1110.29
+Madhubani Painting,Bihar,305.38,520.7,4,61.77,6,low,1175.23
+Blue Pottery,Rajasthan,480.57,469.91,4,96.91,20,medium,1650.09
+Madhubani Painting,Bihar,366.34,769.35,8,80.67,15,medium,2024.7
+Bamboo Craft,Assam,161.81,400.82,3,46.06,11,low,746.86
+Bamboo Craft,Assam,162.16,235.08,2,27.01,18,high,689.62
+Blue Pottery,Rajasthan,499.92,659.14,5,79.04,2,high,1846.59
+Blue Pottery,Rajasthan,361.36,760.99,6,43.02,17,low,1849.19
+Blue Pottery,Rajasthan,225.31,715.9,6,63.98,16,high,1899.33
+Bamboo Craft,Assam,329.37,111.95,1,60.07,4,medium,646.06
+Bamboo Craft,Assam,141.58,454.78,4,63.23,18,low,873.16
+Bamboo Craft,Assam,167.73,288.41,3,56.06,10,high,937.31
+Madhubani Painting,Bihar,215.21,1059.6,7,30.56,11,high,2120.84
+Blue Pottery,Rajasthan,233.99,584.13,4,68.4,13,high,1702.62
+Phulkari,Punjab,525.02,1265.15,8,58.95,12,medium,3146.76
+Madhubani Painting,Bihar,276.62,377.29,4,62.86,5,low,942.64
+Madhubani Painting,Bihar,160.73,698.0,6,57.22,18,medium,1689.4
+Blue Pottery,Rajasthan,436.76,391.35,3,117.14,15,medium,1789.12
+Phulkari,Punjab,355.91,1786.85,15,76.21,21,high,4243.02
+Blue Pottery,Rajasthan,480.22,976.17,7,85.05,22,high,3520.2
+Madhubani Painting,Bihar,397.51,315.93,3,57.36,24,high,1615.99
+Bamboo Craft,Assam,273.88,453.55,4,67.14,12,high,1467.73
+Phulkari,Punjab,476.55,997.24,6,97.4,24,medium,2866.32
+Madhubani Painting,Bihar,364.02,1510.97,10,74.15,18,low,2797.38
+Madhubani Painting,Bihar,364.16,1040.12,10,38.14,18,high,2937.08
+Blue Pottery,Rajasthan,344.44,546.19,5,108.87,8,medium,1682.33
+Phulkari,Punjab,683.72,1562.62,9,68.9,15,medium,4172.26
+Bamboo Craft,Assam,160.08,500.85,4,44.54,15,low,974.63
+Phulkari,Punjab,514.1,1704.97,10,68.03,26,medium,3557.05
+Phulkari,Punjab,613.19,679.23,6,49.85,22,high,2715.13
+Bamboo Craft,Assam,185.18,97.67,1,63.09,16,medium,530.97
+Bamboo Craft,Assam,144.84,404.3,3,40.59,9,low,658.19
+Blue Pottery,Rajasthan,213.37,366.93,3,116.13,18,medium,1281.64
+Blue Pottery,Rajasthan,344.15,476.71,4,105.88,5,low,1205.26
+Madhubani Painting,Bihar,167.97,1019.36,10,67.74,5,low,1653.34
+Blue Pottery,Rajasthan,457.1,976.1,6,108.13,10,medium,2570.03
+Phulkari,Punjab,417.86,1730.29,15,44.52,23,low,3892.85
+Blue Pottery,Rajasthan,312.92,614.56,5,84.25,19,medium,1667.67
+Phulkari,Punjab,692.0,877.0,6,62.58,22,medium,3191.29
+Blue Pottery,Rajasthan,463.47,931.41,6,45.92,22,medium,2519.83
+Phulkari,Punjab,442.56,1426.55,9,42.82,9,high,4055.86
+Phulkari,Punjab,888.8,2673.94,15,50.67,5,high,7152.56
+Madhubani Painting,Bihar,417.09,1597.18,10,58.01,20,low,2871.41
+Madhubani Painting,Bihar,381.32,848.5,7,73.06,18,medium,2324.12
+Phulkari,Punjab,389.74,734.52,6,94.1,3,medium,2016.1
+Phulkari,Punjab,347.53,1901.54,15,85.87,25,medium,3942.47
+Madhubani Painting,Bihar,314.71,447.91,3,55.86,23,high,1369.42
+Madhubani Painting,Bihar,467.05,323.74,3,80.1,4,medium,1142.34
+Bamboo Craft,Assam,210.08,324.3,4,27.21,27,low,764.92
+Phulkari,Punjab,833.78,1682.52,11,67.83,28,medium,5327.84
+Phulkari,Punjab,453.95,1005.56,9,71.01,16,medium,2558.28
+Phulkari,Punjab,663.94,1472.12,9,66.26,6,medium,3996.37
+Phulkari,Punjab,304.4,748.53,6,77.77,17,high,2319.83
+Madhubani Painting,Bihar,393.47,706.59,6,44.36,12,medium,1919.03
+Phulkari,Punjab,811.2,2329.56,15,59.72,28,medium,5919.89
+Madhubani Painting,Bihar,402.58,689.72,7,70.6,1,high,2337.88
+Madhubani Painting,Bihar,455.65,765.64,8,69.82,20,medium,2116.78
+Madhubani Painting,Bihar,204.29,933.71,6,73.5,24,medium,2282.07
+Phulkari,Punjab,571.52,978.91,6,53.3,7,high,3201.31
+Bamboo Craft,Assam,270.89,122.64,1,28.56,14,medium,662.13
+Phulkari,Punjab,797.25,1707.85,11,96.39,14,medium,4297.55
+Madhubani Painting,Bihar,368.13,396.03,4,35.8,1,medium,1272.54
+Bamboo Craft,Assam,200.94,241.05,2,21.99,23,medium,718.62
+Bamboo Craft,Assam,236.4,362.33,3,27.4,19,high,1169.92
+Blue Pottery,Rajasthan,204.92,399.07,3,70.64,24,high,1507.8
+Phulkari,Punjab,458.54,1056.15,7,55.3,9,low,2480.83
+Bamboo Craft,Assam,245.15,248.03,3,49.83,8,medium,927.15
+Bamboo Craft,Assam,187.79,510.27,4,62.18,14,high,1204.02
+Blue Pottery,Rajasthan,323.62,615.94,6,44.49,13,medium,1566.0
+Blue Pottery,Rajasthan,418.82,370.97,3,118.82,23,medium,1563.11
+Madhubani Painting,Bihar,310.03,630.36,6,51.17,22,high,1927.05
+Bamboo Craft,Assam,286.69,593.93,4,58.02,14,low,1184.38
+Bamboo Craft,Assam,275.32,564.21,4,62.93,17,medium,1435.04
+Madhubani Painting,Bihar,430.44,755.55,5,33.13,8,high,2188.96
+Phulkari,Punjab,612.82,1515.97,9,55.8,10,medium,3650.09
+Blue Pottery,Rajasthan,533.64,611.91,5,98.17,16,medium,2086.0
+Phulkari,Punjab,328.78,934.5,6,41.18,12,medium,2196.77
+Blue Pottery,Rajasthan,355.46,846.54,6,67.83,20,high,2409.95
+Phulkari,Punjab,393.43,550.03,5,88.92,18,medium,1579.02
+Bamboo Craft,Assam,276.83,369.32,4,46.09,9,high,1095.96
+Bamboo Craft,Assam,167.93,427.54,3,24.03,19,low,848.12
+Bamboo Craft,Assam,290.31,397.91,4,67.56,3,medium,1159.88
+Blue Pottery,Rajasthan,458.95,475.34,4,72.76,27,high,1816.81
+Madhubani Painting,Bihar,435.76,782.89,6,32.72,13,high,2450.62
+Madhubani Painting,Bihar,351.52,1256.98,9,55.06,16,medium,2847.16
+Madhubani Painting,Bihar,336.72,657.13,5,64.84,19,high,1978.48
+Madhubani Painting,Bihar,266.54,314.48,3,41.4,14,high,1079.84
+Phulkari,Punjab,323.64,2084.7,12,81.29,9,low,3588.7
+Phulkari,Punjab,465.56,1481.91,11,63.71,7,high,3322.16
+Madhubani Painting,Bihar,469.63,596.26,5,80.26,16,high,2158.68
+Bamboo Craft,Assam,162.59,96.02,1,53.71,20,low,433.5
+Bamboo Craft,Assam,250.1,261.76,3,45.37,19,high,965.79
+Phulkari,Punjab,493.11,1532.37,11,76.54,13,medium,3435.51
+Blue Pottery,Rajasthan,268.33,841.97,5,77.89,24,medium,2463.19
+Blue Pottery,Rajasthan,435.58,505.95,4,98.72,13,low,1734.81
+Phulkari,Punjab,307.42,2201.06,15,84.62,14,high,5433.19
+Madhubani Painting,Bihar,349.73,682.53,5,35.14,17,medium,1700.91
+Blue Pottery,Rajasthan,272.45,398.86,3,99.27,13,high,1472.83
+Phulkari,Punjab,413.14,1827.77,13,54.99,12,high,3868.93
+Blue Pottery,Rajasthan,443.62,739.54,5,78.54,12,medium,2065.88
+Bamboo Craft,Assam,222.57,340.58,4,24.04,12,medium,866.96
+Phulkari,Punjab,463.28,2022.16,14,59.24,25,low,5603.81
+Bamboo Craft,Assam,128.91,195.66,2,55.44,30,medium,638.5
+Bamboo Craft,Assam,153.03,83.54,1,36.68,27,low,421.58
+Madhubani Painting,Bihar,333.38,624.65,4,70.09,15,high,1601.14
+Blue Pottery,Rajasthan,343.62,401.77,3,55.61,8,medium,1337.37
+Blue Pottery,Rajasthan,481.88,616.82,4,107.72,26,medium,2106.86
+Phulkari,Punjab,515.21,1406.08,12,92.08,14,high,3600.17
+Bamboo Craft,Assam,249.84,280.96,2,33.81,16,high,886.02
+Phulkari,Punjab,523.57,1228.01,10,64.05,20,medium,3604.14
+Bamboo Craft,Assam,236.24,222.89,2,33.91,23,low,638.31
+Blue Pottery,Rajasthan,355.53,457.62,4,100.19,15,low,1512.65
+Blue Pottery,Rajasthan,542.65,924.5,7,109.88,17,medium,2424.72
+Blue Pottery,Rajasthan,544.88,392.2,3,119.52,15,high,1950.58
+Madhubani Painting,Bihar,481.24,883.02,6,83.08,21,medium,2232.48
+Bamboo Craft,Assam,216.22,307.68,3,32.27,20,medium,874.04
+Phulkari,Punjab,336.02,1290.22,9,77.79,8,medium,3037.58
+Madhubani Painting,Bihar,273.3,1175.56,8,40.51,16,medium,2275.69
+Bamboo Craft,Assam,113.02,287.09,3,23.43,16,low,546.04
+Blue Pottery,Rajasthan,511.58,739.7,6,118.93,14,medium,2182.68
+Blue Pottery,Rajasthan,221.8,389.8,3,63.56,10,low,842.39
+Phulkari,Punjab,373.18,1095.49,8,98.5,15,low,3273.31
+Bamboo Craft,Assam,301.78,470.14,4,68.66,8,high,1446.1
+Blue Pottery,Rajasthan,350.14,931.27,6,86.24,15,medium,2366.75
+Madhubani Painting,Bihar,354.3,395.35,3,45.93,4,medium,959.21
+Phulkari,Punjab,637.37,2099.23,14,80.03,4,high,5287.4
+Phulkari,Punjab,657.82,1403.57,10,81.21,30,medium,5086.89
+Bamboo Craft,Assam,237.09,319.99,3,49.87,12,medium,1003.31
+Bamboo Craft,Assam,239.07,133.38,1,48.71,19,high,679.59
+Bamboo Craft,Assam,158.72,287.17,3,29.96,20,medium,783.34
+Phulkari,Punjab,817.21,1417.67,12,44.05,1,medium,3018.04
+Bamboo Craft,Assam,267.5,419.01,4,53.27,15,high,1186.56
+Blue Pottery,Rajasthan,365.22,660.46,5,99.83,7,medium,1709.54
+Bamboo Craft,Assam,242.16,122.67,1,57.0,19,low,599.24
+Blue Pottery,Rajasthan,274.78,568.98,5,49.12,11,high,1481.47
+Bamboo Craft,Assam,165.54,550.28,4,67.01,18,low,1205.22
+Phulkari,Punjab,553.09,2100.2,14,90.93,18,low,4466.99
+Blue Pottery,Rajasthan,295.03,986.75,6,111.76,27,medium,2410.51
+Phulkari,Punjab,453.54,1135.78,8,98.64,14,high,3763.92
+Bamboo Craft,Assam,265.3,219.52,2,47.23,5,high,677.49
+Phulkari,Punjab,381.83,1823.51,11,90.97,12,medium,4812.77
+Bamboo Craft,Assam,242.46,414.19,4,44.72,11,medium,1022.26
+Madhubani Painting,Bihar,250.84,689.71,7,44.31,8,low,1386.83
+Phulkari,Punjab,303.97,2301.77,13,90.88,10,high,5996.94
+Madhubani Painting,Bihar,382.43,859.98,6,70.82,4,medium,1843.56
+Bamboo Craft,Assam,335.61,127.72,1,46.85,13,low,735.37
+Madhubani Painting,Bihar,414.66,856.87,7,73.15,8,low,1911.36
+Phulkari,Punjab,474.81,1371.39,9,63.73,24,high,3992.41
+Blue Pottery,Rajasthan,361.64,738.26,5,97.7,1,medium,1515.3
+Phulkari,Punjab,644.71,1299.21,9,99.06,19,low,3430.56
+Phulkari,Punjab,351.45,1829.48,12,68.28,10,medium,3595.51
+Bamboo Craft,Assam,203.72,353.95,3,40.79,16,high,1076.88
+Blue Pottery,Rajasthan,256.54,775.66,6,51.03,11,medium,1918.48
+Bamboo Craft,Assam,349.84,349.86,4,39.07,11,medium,997.28
+Blue Pottery,Rajasthan,262.16,525.88,4,65.12,19,high,1693.15
+Madhubani Painting,Bihar,267.13,772.92,8,70.7,12,medium,2063.28
+Blue Pottery,Rajasthan,396.69,805.25,6,46.61,26,medium,2157.32
+Blue Pottery,Rajasthan,449.09,754.67,6,117.75,27,high,2689.18
+Madhubani Painting,Bihar,399.09,708.88,5,49.0,15,medium,1775.0
+Phulkari,Punjab,332.49,1578.31,11,72.45,7,medium,3125.87
+Phulkari,Punjab,779.94,2580.43,15,50.01,22,high,8292.08
+Blue Pottery,Rajasthan,491.52,1016.32,7,55.03,18,high,3534.86
+Madhubani Painting,Bihar,387.41,1223.18,10,46.91,8,high,3173.69
+Madhubani Painting,Bihar,196.55,786.43,8,89.57,12,high,2048.15
+Phulkari,Punjab,775.07,2164.79,14,93.41,5,medium,4778.84
+Madhubani Painting,Bihar,307.49,791.87,8,79.74,6,high,1767.44
+Blue Pottery,Rajasthan,262.92,487.8,3,93.93,23,low,1583.28
+Bamboo Craft,Assam,200.63,345.1,3,44.69,16,medium,852.31
+Phulkari,Punjab,879.63,2013.96,14,54.6,8,medium,6087.39
+Bamboo Craft,Assam,107.24,407.19,3,34.67,12,medium,829.97
+Bamboo Craft,Assam,166.26,501.95,4,62.59,23,medium,981.82
+Phulkari,Punjab,879.22,2041.79,15,96.97,6,low,4049.2
+Phulkari,Punjab,803.42,2241.78,13,76.77,31,medium,6086.17
+Phulkari,Punjab,398.93,1224.73,11,53.46,19,low,2824.82
+Madhubani Painting,Bihar,297.13,1092.58,9,85.03,12,high,2833.29
+Madhubani Painting,Bihar,324.94,402.71,3,64.5,13,low,1046.04
+Phulkari,Punjab,352.51,612.3,5,55.11,26,high,2227.39
+Phulkari,Punjab,771.65,1988.76,13,81.07,21,medium,5782.59
+Madhubani Painting,Bihar,402.32,928.94,7,41.54,15,low,2380.37
+Phulkari,Punjab,408.02,1671.51,11,73.82,26,medium,3923.57
+Bamboo Craft,Assam,218.82,197.11,2,63.62,10,medium,738.24
+Bamboo Craft,Assam,281.05,577.47,4,69.04,1,medium,1274.96
+Bamboo Craft,Assam,120.99,358.0,4,43.08,21,low,720.06
+Phulkari,Punjab,542.05,1254.84,10,52.8,11,low,3335.41
+Blue Pottery,Rajasthan,305.36,697.49,5,52.09,13,medium,1841.8
+Phulkari,Punjab,606.33,1224.51,8,80.44,8,high,3539.13
+Madhubani Painting,Bihar,380.75,271.39,3,63.1,23,medium,1315.59
+Phulkari,Punjab,538.07,1439.64,13,54.33,34,medium,4045.43
+Blue Pottery,Rajasthan,329.15,618.21,5,86.23,7,medium,1691.67
+Phulkari,Punjab,343.73,1467.78,10,97.42,2,low,2920.23
+Bamboo Craft,Assam,221.09,355.9,3,47.17,9,low,869.24
+Bamboo Craft,Assam,334.76,246.87,3,38.53,1,high,911.88
+Blue Pottery,Rajasthan,555.77,758.71,7,94.46,7,high,2308.6
+Madhubani Painting,Bihar,358.68,302.67,3,75.27,17,medium,1164.32
+Blue Pottery,Rajasthan,240.19,423.81,3,70.72,20,low,1097.19
+Phulkari,Punjab,373.9,2481.73,15,62.51,7,medium,4720.8
+Madhubani Painting,Bihar,480.21,864.1,8,79.3,24,medium,2140.65
+Madhubani Painting,Bihar,350.51,950.3,7,71.57,18,medium,2179.83
+Madhubani Painting,Bihar,432.02,388.1,3,88.07,11,low,1188.88
+Blue Pottery,Rajasthan,455.33,980.74,6,93.75,1,high,2892.55
+Blue Pottery,Rajasthan,525.35,579.64,4,94.17,23,medium,2007.65
+Madhubani Painting,Bihar,376.35,1492.99,10,35.55,14,medium,2990.97
+Madhubani Painting,Bihar,151.81,592.42,5,86.1,20,low,1306.62
+Phulkari,Punjab,873.71,1242.29,7,40.26,14,medium,3635.48
+Bamboo Craft,Assam,192.22,134.45,1,28.19,11,high,627.47
+Bamboo Craft,Assam,242.95,279.84,2,40.54,11,high,945.09
+Phulkari,Punjab,843.38,1559.63,13,51.04,11,low,4008.9
+Madhubani Painting,Bihar,264.23,1013.94,7,57.03,16,medium,2115.54
+Blue Pottery,Rajasthan,402.64,1075.88,7,73.89,6,medium,2398.59
+Madhubani Painting,Bihar,198.03,771.83,7,37.2,7,low,1410.57
+Bamboo Craft,Assam,240.35,250.67,2,51.77,4,medium,707.18
+Madhubani Painting,Bihar,257.95,1007.18,8,59.84,31,medium,2681.7
+Bamboo Craft,Assam,172.03,387.63,3,42.7,8,high,861.87
+Bamboo Craft,Assam,187.25,141.55,1,38.48,22,high,709.06
+Bamboo Craft,Assam,165.49,474.47,4,41.38,17,high,1242.63
+Madhubani Painting,Bihar,459.31,320.54,3,34.04,8,medium,1292.57
+Madhubani Painting,Bihar,418.44,1199.41,9,31.82,21,medium,2444.53
+Bamboo Craft,Assam,169.91,356.72,3,45.83,16,medium,897.94
+Blue Pottery,Rajasthan,574.68,492.73,4,46.22,11,medium,2128.76
+Blue Pottery,Rajasthan,268.88,660.42,6,88.69,14,high,1808.51
+Bamboo Craft,Assam,202.78,127.14,1,69.21,20,medium,677.2
+Bamboo Craft,Assam,297.11,243.31,3,33.27,20,low,760.31
+Madhubani Painting,Bihar,230.54,760.36,8,81.71,16,high,2072.36
+Madhubani Painting,Bihar,360.84,409.6,4,76.37,3,high,1387.5
+Blue Pottery,Rajasthan,407.78,603.9,6,95.65,23,medium,1490.85
+Bamboo Craft,Assam,224.18,402.91,3,31.51,16,low,819.52
+Bamboo Craft,Assam,305.14,392.47,3,61.87,5,high,1126.27
+Phulkari,Punjab,774.88,1571.65,11,67.28,33,medium,5172.14
+Blue Pottery,Rajasthan,247.76,337.66,3,104.35,32,low,1130.16
+Bamboo Craft,Assam,140.0,486.99,4,39.24,8,medium,922.35
+Phulkari,Punjab,684.5,1519.27,9,48.06,13,medium,3387.06
+Phulkari,Punjab,598.64,1735.75,14,55.78,10,high,4411.23
+Madhubani Painting,Bihar,334.26,869.7,8,53.81,10,medium,2243.03
+Phulkari,Punjab,793.95,2097.72,12,66.12,19,low,4491.96
+Bamboo Craft,Assam,251.58,268.6,2,39.02,19,medium,810.23
+Bamboo Craft,Assam,176.55,339.38,3,46.55,4,medium,852.76
+Madhubani Painting,Bihar,481.68,1034.4,10,90.0,18,high,3012.76
+Bamboo Craft,Assam,326.36,254.88,3,31.9,12,low,865.16
+Madhubani Painting,Bihar,307.41,675.04,6,58.54,16,low,1688.89
+Bamboo Craft,Assam,331.63,399.87,4,54.83,13,medium,1028.29
+Blue Pottery,Rajasthan,442.93,665.98,6,48.1,16,medium,2144.82
+Bamboo Craft,Assam,315.43,258.64,2,22.29,15,low,803.23
+Bamboo Craft,Assam,283.09,143.67,1,36.34,10,high,823.26
+Phulkari,Punjab,354.1,1447.47,9,73.55,9,high,3304.51
+Phulkari,Punjab,486.95,2158.29,12,67.82,16,high,5791.0
+Madhubani Painting,Bihar,431.62,650.61,7,87.32,28,medium,2227.1
+Phulkari,Punjab,469.27,1120.45,7,83.63,15,medium,2985.5
+Phulkari,Punjab,620.39,1649.73,10,58.0,6,medium,4041.04
+Bamboo Craft,Assam,147.47,295.62,2,48.96,3,low,620.47
+Phulkari,Punjab,817.55,1006.71,7,69.29,20,low,3199.81
+Madhubani Painting,Bihar,400.93,1267.99,10,76.15,16,high,3137.34
+Blue Pottery,Rajasthan,596.27,499.94,3,108.37,6,low,1568.12
+Phulkari,Punjab,362.23,2013.02,14,74.14,6,high,4964.57
+Blue Pottery,Rajasthan,324.76,929.39,6,81.69,13,high,2524.46
+Madhubani Painting,Bihar,332.44,999.32,9,33.66,28,high,2558.06
+Bamboo Craft,Assam,141.48,364.96,3,61.21,21,medium,806.06
+Madhubani Painting,Bihar,235.66,354.48,3,44.06,17,low,1041.68
+Phulkari,Punjab,859.11,1206.81,9,64.71,8,medium,4023.82
+Phulkari,Punjab,340.42,742.92,6,74.84,21,medium,1972.61
+Bamboo Craft,Assam,118.47,447.41,3,34.96,25,medium,879.04
+Madhubani Painting,Bihar,330.24,449.35,4,57.99,14,low,1203.73
+Bamboo Craft,Assam,285.49,210.99,2,23.5,11,medium,771.58
+Blue Pottery,Rajasthan,517.52,302.51,3,106.43,18,high,1720.62
+Blue Pottery,Rajasthan,564.61,568.32,4,40.68,14,medium,2426.11
+Bamboo Craft,Assam,199.35,258.96,3,39.73,14,medium,795.97
+Blue Pottery,Rajasthan,306.0,889.89,7,69.68,11,low,1944.3
+Blue Pottery,Rajasthan,303.46,359.86,3,70.93,19,high,1641.83
+Bamboo Craft,Assam,178.14,379.67,3,38.72,24,low,1014.79
+Bamboo Craft,Assam,261.89,139.47,1,61.12,29,medium,863.46
+Blue Pottery,Rajasthan,226.87,470.14,3,49.21,20,medium,1107.43
+Madhubani Painting,Bihar,274.94,451.82,3,49.92,19,high,1542.35
+Madhubani Painting,Bihar,317.36,1423.41,10,66.34,7,medium,2856.63
+Bamboo Craft,Assam,150.29,323.79,3,53.58,4,medium,757.89
+Bamboo Craft,Assam,279.94,346.5,3,53.34,10,medium,989.15
+Phulkari,Punjab,477.86,1852.14,15,70.83,19,high,4925.54
+Blue Pottery,Rajasthan,451.9,579.33,4,74.57,24,low,1869.74
+Phulkari,Punjab,812.99,1644.8,11,76.71,22,low,4392.9
+Blue Pottery,Rajasthan,587.11,491.25,4,62.42,16,high,1902.0
+Madhubani Painting,Bihar,428.24,498.99,5,62.79,20,high,2217.08
+Phulkari,Punjab,570.68,1543.43,11,41.01,10,medium,3621.16
+Madhubani Painting,Bihar,472.54,723.42,8,82.19,8,low,1794.7
+Bamboo Craft,Assam,199.85,299.63,2,26.92,3,high,757.51
+Blue Pottery,Rajasthan,246.39,998.33,7,64.74,14,low,1913.36
+Blue Pottery,Rajasthan,228.33,637.52,6,104.48,20,medium,1693.05
+Blue Pottery,Rajasthan,348.99,918.59,7,116.84,6,medium,2428.27
+Madhubani Painting,Bihar,473.45,1203.98,8,67.63,16,medium,2693.97
+Bamboo Craft,Assam,169.47,294.01,2,36.83,17,high,869.97
+Madhubani Painting,Bihar,246.14,343.91,3,34.45,13,medium,931.32
+Bamboo Craft,Assam,293.12,135.74,1,48.3,23,medium,681.94
+Blue Pottery,Rajasthan,429.13,715.87,7,88.19,31,low,1948.18
+Bamboo Craft,Assam,260.0,255.85,2,62.14,15,low,723.7
+Phulkari,Punjab,485.62,1293.05,8,66.59,21,low,2929.89
+Madhubani Painting,Bihar,320.32,652.25,7,53.72,14,medium,1498.36
+Bamboo Craft,Assam,241.84,86.0,1,44.3,25,high,624.69
+Phulkari,Punjab,569.29,1728.19,15,97.75,14,low,3607.2
+Phulkari,Punjab,762.56,2126.15,13,45.0,14,medium,5945.59
+Madhubani Painting,Bihar,496.18,1522.48,10,38.05,9,high,3376.46
+Madhubani Painting,Bihar,363.83,1331.0,9,60.92,23,low,2556.49
+Blue Pottery,Rajasthan,588.87,435.33,4,73.87,22,high,2210.74
+Bamboo Craft,Assam,212.07,347.78,3,25.45,1,low,777.56
+Blue Pottery,Rajasthan,533.81,365.14,3,75.0,19,low,1679.95
+Madhubani Painting,Bihar,433.68,1093.99,8,72.57,9,medium,2216.89
+Phulkari,Punjab,684.17,1329.0,12,91.03,22,low,3749.61
+Madhubani Painting,Bihar,497.46,780.22,6,40.17,12,medium,2089.14
+Blue Pottery,Rajasthan,568.16,828.33,6,103.26,5,medium,2714.24
+Bamboo Craft,Assam,267.62,484.46,4,56.33,22,high,1344.04
+Blue Pottery,Rajasthan,405.77,328.47,3,100.01,12,medium,1452.2
+Phulkari,Punjab,811.35,1661.12,10,58.76,14,high,4369.49
+Madhubani Painting,Bihar,254.17,975.4,7,71.41,7,medium,2170.03
+Phulkari,Punjab,741.47,1775.04,15,53.79,18,low,3706.66
+Madhubani Painting,Bihar,200.49,1125.05,9,32.72,19,medium,2259.37
+Madhubani Painting,Bihar,407.49,1262.42,10,84.81,23,high,3239.42
+Madhubani Painting,Bihar,413.34,1063.8,10,44.35,26,high,2593.66
+Blue Pottery,Rajasthan,518.39,401.79,4,72.8,15,high,2158.03
+Phulkari,Punjab,489.44,1461.55,10,40.58,17,low,3335.17
+Madhubani Painting,Bihar,434.02,560.49,4,86.62,19,high,2146.98
+Madhubani Painting,Bihar,262.41,460.67,3,35.37,7,high,1363.8
+Blue Pottery,Rajasthan,595.91,454.56,3,92.29,15,low,1879.76
+Madhubani Painting,Bihar,168.79,956.25,9,34.56,7,medium,1840.42
+Bamboo Craft,Assam,274.35,249.3,2,57.64,15,medium,861.36
+Blue Pottery,Rajasthan,306.61,460.45,3,115.82,1,medium,1398.89
+Madhubani Painting,Bihar,198.16,1079.52,7,58.35,20,medium,2028.66
+Madhubani Painting,Bihar,470.02,895.24,8,32.74,22,low,1976.28
+Madhubani Painting,Bihar,284.45,966.41,9,81.92,18,medium,2139.71
+Blue Pottery,Rajasthan,398.32,795.82,7,48.56,9,medium,2373.82
+Bamboo Craft,Assam,208.97,591.34,4,43.5,9,low,1060.02
+Bamboo Craft,Assam,139.26,237.28,2,27.83,6,medium,537.46
+Phulkari,Punjab,612.56,1667.75,12,51.03,26,medium,4999.47
+Madhubani Painting,Bihar,381.78,1007.66,9,40.39,20,medium,2393.85
+Blue Pottery,Rajasthan,565.58,694.3,6,59.86,20,high,2538.15
+Madhubani Painting,Bihar,325.88,968.24,7,68.32,21,low,2212.08
+Blue Pottery,Rajasthan,580.4,459.38,3,70.1,14,low,1812.76
+Phulkari,Punjab,649.59,1075.37,7,70.65,20,high,4103.2
+Blue Pottery,Rajasthan,593.56,544.48,4,84.15,11,medium,2279.71
+Phulkari,Punjab,732.15,1887.19,12,68.74,6,medium,4094.42
+Blue Pottery,Rajasthan,509.42,1074.6,7,79.17,15,medium,2822.28
+Blue Pottery,Rajasthan,365.59,811.48,7,44.88,8,high,2430.19
+Blue Pottery,Rajasthan,274.86,656.1,5,51.89,7,medium,1499.09
+Blue Pottery,Rajasthan,560.18,1031.99,7,89.62,23,low,3250.92
+Phulkari,Punjab,361.62,1965.69,13,50.02,17,medium,4357.31
+Blue Pottery,Rajasthan,479.78,520.18,4,47.3,19,low,1739.03
+Blue Pottery,Rajasthan,432.21,808.31,7,69.93,4,medium,1945.72
+Bamboo Craft,Assam,238.55,273.83,2,31.65,16,medium,690.46
+Blue Pottery,Rajasthan,355.31,422.43,3,119.58,17,high,1700.91
+Blue Pottery,Rajasthan,462.45,565.93,5,81.38,15,high,2298.72
+Blue Pottery,Rajasthan,596.94,643.22,5,85.55,21,medium,2340.92
+Phulkari,Punjab,753.58,1584.61,14,90.9,9,medium,4659.56
+Madhubani Painting,Bihar,326.0,444.59,3,61.09,13,high,1408.92
+Madhubani Painting,Bihar,339.2,1286.03,9,38.4,26,medium,3067.96
+Bamboo Craft,Assam,184.68,112.78,1,23.76,15,medium,472.09
+Bamboo Craft,Assam,298.43,252.24,2,34.19,9,low,784.39
+Phulkari,Punjab,673.68,975.22,7,93.92,5,medium,3149.76
+Madhubani Painting,Bihar,156.0,1317.89,9,84.59,17,low,2163.03
+Bamboo Craft,Assam,158.05,336.51,3,53.34,21,medium,812.46
+Bamboo Craft,Assam,315.18,284.12,3,32.48,24,high,1144.94
+Madhubani Painting,Bihar,375.63,532.2,4,60.42,6,high,1806.97
+Phulkari,Punjab,854.62,1108.99,7,50.42,16,medium,3638.22
+Phulkari,Punjab,396.56,1420.54,9,48.79,26,low,3435.91
+Phulkari,Punjab,468.49,861.58,7,61.73,14,low,2392.72
+Madhubani Painting,Bihar,389.55,1070.66,7,63.81,30,medium,2962.85
+Bamboo Craft,Assam,123.31,132.12,1,38.63,16,high,504.31
+Blue Pottery,Rajasthan,588.86,797.54,5,103.65,1,high,2842.05
+Bamboo Craft,Assam,225.71,167.96,2,45.39,16,low,636.04
+Blue Pottery,Rajasthan,312.37,822.36,6,101.35,33,low,2154.74
+Madhubani Painting,Bihar,422.48,922.8,8,86.97,18,medium,2246.6
+Madhubani Painting,Bihar,362.19,564.79,5,66.78,26,high,2056.1
+Phulkari,Punjab,449.82,1888.91,14,86.74,17,high,5006.14
+Blue Pottery,Rajasthan,598.91,590.88,4,84.01,22,high,2416.77
+Madhubani Painting,Bihar,178.91,859.72,9,66.15,18,medium,1494.01
+Bamboo Craft,Assam,165.19,290.12,3,39.79,12,medium,725.73
+Blue Pottery,Rajasthan,550.33,544.97,4,80.76,14,low,1888.15
+Phulkari,Punjab,640.38,847.99,5,95.94,22,medium,2794.22
+Bamboo Craft,Assam,255.17,289.61,2,31.84,21,low,868.97
+Madhubani Painting,Bihar,292.89,814.47,7,75.26,1,medium,1840.63
+Blue Pottery,Rajasthan,480.6,539.0,4,67.74,2,medium,1632.5
+Bamboo Craft,Assam,279.68,564.27,4,21.79,23,high,1716.76
+Bamboo Craft,Assam,125.25,335.22,3,61.71,18,medium,859.0
+Bamboo Craft,Assam,222.13,86.46,1,41.18,14,high,596.58
+Blue Pottery,Rajasthan,445.65,495.41,4,54.2,19,low,1282.23
+Blue Pottery,Rajasthan,340.33,708.9,5,53.47,20,medium,2104.16
+Bamboo Craft,Assam,307.51,396.85,4,48.3,10,low,926.53
+Phulkari,Punjab,493.58,820.78,5,77.52,18,high,2760.2
+Bamboo Craft,Assam,302.01,83.54,1,69.96,24,high,736.29
+Bamboo Craft,Assam,316.75,336.19,3,68.2,22,medium,1182.24
+Blue Pottery,Rajasthan,458.1,555.38,4,79.17,18,medium,1743.86
+Blue Pottery,Rajasthan,553.11,625.61,6,62.38,18,high,2472.86
+Phulkari,Punjab,745.76,1250.13,9,91.21,17,medium,4078.34
+Madhubani Painting,Bihar,490.84,318.25,3,84.08,11,medium,1403.83
+Phulkari,Punjab,389.18,1381.95,11,86.33,14,medium,3162.24
+Blue Pottery,Rajasthan,499.91,756.53,5,49.44,20,medium,2205.37
+Phulkari,Punjab,685.99,1839.17,11,44.73,6,low,4143.58
+Phulkari,Punjab,366.26,2195.64,14,48.95,22,high,5100.58
+Blue Pottery,Rajasthan,599.08,643.91,6,73.28,18,high,2298.26
+Phulkari,Punjab,489.64,1946.0,12,41.07,13,medium,4802.46
+Bamboo Craft,Assam,171.73,540.01,4,50.33,11,medium,1170.23
+Phulkari,Punjab,613.23,1712.38,10,81.86,1,medium,4519.9
+Phulkari,Punjab,592.12,2065.22,12,40.4,20,low,4397.14
+Bamboo Craft,Assam,271.91,134.49,1,30.94,18,medium,608.0
+Bamboo Craft,Assam,347.1,229.35,2,21.85,5,high,1011.28
+Bamboo Craft,Assam,181.04,87.83,1,38.15,27,low,416.75
+Phulkari,Punjab,747.69,1159.44,8,51.98,13,low,2604.47
+Bamboo Craft,Assam,309.81,193.4,2,43.68,27,medium,896.42
+Bamboo Craft,Assam,242.76,388.04,4,43.65,12,medium,965.2
+Bamboo Craft,Assam,346.81,126.75,1,47.73,17,high,819.96
+Phulkari,Punjab,657.99,1928.25,13,45.11,17,high,5441.29
+Madhubani Painting,Bihar,229.05,543.05,4,81.49,15,medium,1328.04
+Bamboo Craft,Assam,266.23,509.65,4,65.14,10,medium,1044.6
+Bamboo Craft,Assam,322.86,552.56,4,47.39,24,medium,1278.64
+Phulkari,Punjab,666.51,947.62,8,91.13,17,low,3032.62
+Blue Pottery,Rajasthan,581.87,762.07,6,59.29,13,high,2279.35
+Madhubani Painting,Bihar,290.2,692.26,6,47.32,9,medium,1762.51
+Phulkari,Punjab,471.08,1038.05,6,59.07,5,medium,2786.82
+Madhubani Painting,Bihar,362.48,982.1,9,75.3,20,medium,2498.31
+Blue Pottery,Rajasthan,430.97,719.73,5,70.01,26,high,2507.97
+Bamboo Craft,Assam,147.89,397.42,4,49.48,15,high,971.1
+Phulkari,Punjab,780.02,1001.76,7,40.58,11,high,3759.28
+Blue Pottery,Rajasthan,514.3,1131.27,7,110.23,14,medium,3184.16
+Phulkari,Punjab,792.64,892.91,6,50.71,13,medium,2950.09
+Blue Pottery,Rajasthan,480.29,611.32,5,61.76,19,high,2315.03
+Madhubani Painting,Bihar,169.64,417.6,3,34.96,20,medium,1040.3
+Phulkari,Punjab,543.08,1748.51,14,42.2,14,medium,4878.7
+Madhubani Painting,Bihar,481.62,1044.51,7,45.04,9,low,1987.3
+Phulkari,Punjab,618.3,2179.56,13,98.87,25,medium,6074.86
+Madhubani Painting,Bihar,355.06,863.99,9,67.12,18,low,1590.37
+Blue Pottery,Rajasthan,305.18,1007.49,7,79.69,12,high,2381.16
+Bamboo Craft,Assam,118.14,493.92,4,48.15,22,medium,975.93
+Phulkari,Punjab,720.42,748.44,6,63.82,28,medium,2829.92
+Madhubani Painting,Bihar,338.92,409.01,3,82.58,8,low,1016.34
+Phulkari,Punjab,645.54,1335.95,8,83.25,17,high,3601.14
+Phulkari,Punjab,488.35,2005.65,13,52.05,10,medium,4477.07
+Phulkari,Punjab,846.89,2036.13,15,75.3,14,high,5249.14
+Madhubani Painting,Bihar,469.06,982.97,9,88.8,17,medium,2364.64
+Phulkari,Punjab,611.46,1633.34,14,79.7,15,medium,4279.5
+Blue Pottery,Rajasthan,219.36,431.5,3,106.94,31,low,1278.75
+Phulkari,Punjab,885.9,1848.66,13,81.35,19,medium,4959.19
+Phulkari,Punjab,476.5,837.71,7,76.15,21,high,2786.54
+Bamboo Craft,Assam,180.82,562.17,4,61.25,29,medium,1160.72
+Phulkari,Punjab,510.31,1635.76,14,48.03,9,high,4062.41
+Madhubani Painting,Bihar,159.2,981.75,8,88.98,24,low,1997.67
+Phulkari,Punjab,869.09,1591.1,13,75.86,8,medium,4130.12
+Blue Pottery,Rajasthan,233.7,994.49,7,97.69,11,low,2483.67
+Blue Pottery,Rajasthan,546.88,408.21,3,52.72,11,low,1768.04
+Bamboo Craft,Assam,259.86,131.91,1,32.24,17,high,732.98
+Madhubani Painting,Bihar,263.26,542.87,6,53.01,9,medium,1357.48
+Madhubani Painting,Bihar,430.38,783.48,5,38.57,5,low,1447.25
+Phulkari,Punjab,384.22,857.78,7,96.92,5,high,2199.22
+Bamboo Craft,Assam,128.6,220.21,2,64.4,3,medium,634.09
+Blue Pottery,Rajasthan,533.29,405.02,4,40.33,14,high,1682.94
+Madhubani Painting,Bihar,421.68,1127.33,8,79.14,17,low,2135.32
+Madhubani Painting,Bihar,405.89,982.11,7,30.85,11,medium,2124.18
+Bamboo Craft,Assam,174.06,277.68,3,20.71,9,high,758.21
+Madhubani Painting,Bihar,355.46,1395.19,9,47.96,6,high,3050.84
+Bamboo Craft,Assam,322.43,198.13,2,50.24,14,medium,766.13
+Bamboo Craft,Assam,271.61,180.89,2,48.14,7,low,813.2
+Blue Pottery,Rajasthan,441.28,534.12,4,54.21,10,high,2014.12
+Phulkari,Punjab,597.5,806.68,7,69.5,16,low,2640.86
+Phulkari,Punjab,668.22,1778.95,14,42.39,20,high,4469.16
+Blue Pottery,Rajasthan,307.16,1103.41,7,69.35,15,high,2784.46
+Phulkari,Punjab,584.64,870.69,7,81.14,22,low,2660.13
+Phulkari,Punjab,689.92,1588.83,13,86.82,8,medium,4633.83
+Madhubani Painting,Bihar,364.75,397.89,3,69.47,14,medium,1366.59
+Madhubani Painting,Bihar,196.18,1097.78,9,33.46,2,high,2181.89
+Blue Pottery,Rajasthan,528.66,656.32,5,61.22,15,medium,1950.99
+Madhubani Painting,Bihar,392.5,702.41,5,32.62,7,high,2095.6
+Madhubani Painting,Bihar,425.98,855.03,8,69.43,22,high,2380.9
+Madhubani Painting,Bihar,343.98,1203.68,8,30.74,4,high,2801.31
+Bamboo Craft,Assam,229.61,495.11,4,58.0,17,high,1388.42
+Blue Pottery,Rajasthan,359.85,838.0,5,74.44,20,medium,2223.57
+Bamboo Craft,Assam,202.0,298.92,2,65.65,11,high,924.89
+Madhubani Painting,Bihar,299.52,932.82,10,50.66,10,medium,1964.2
+Blue Pottery,Rajasthan,377.37,425.75,4,107.78,16,high,1502.83
+Madhubani Painting,Bihar,244.42,480.55,5,55.86,7,low,957.54
+Madhubani Painting,Bihar,258.6,844.08,8,76.75,23,medium,1878.83
+Blue Pottery,Rajasthan,316.53,471.98,3,103.65,8,medium,1411.26
+Phulkari,Punjab,826.06,1408.51,11,40.33,14,medium,4054.77
+Blue Pottery,Rajasthan,565.07,857.59,7,61.63,24,low,2632.07
+Phulkari,Punjab,667.67,1107.91,9,55.77,12,medium,3427.42
+Bamboo Craft,Assam,116.01,121.18,1,31.51,15,medium,383.11
+Phulkari,Punjab,879.5,554.54,5,55.08,6,high,2860.97
+Phulkari,Punjab,530.6,1682.75,11,71.26,12,high,4498.6
+Bamboo Craft,Assam,327.01,431.06,4,55.75,24,medium,1205.3
+Blue Pottery,Rajasthan,394.88,560.97,5,117.5,9,high,1596.31
+Madhubani Painting,Bihar,463.12,1023.59,9,41.21,12,high,2380.45
+Madhubani Painting,Bihar,398.35,727.79,5,60.53,18,low,1921.16
+Blue Pottery,Rajasthan,542.63,425.54,4,59.86,9,medium,1672.37
+Bamboo Craft,Assam,260.71,197.08,2,32.33,9,medium,747.91
+Bamboo Craft,Assam,279.15,327.25,3,44.12,7,low,799.83
+Blue Pottery,Rajasthan,200.51,784.05,6,73.57,18,high,2067.14
+Madhubani Painting,Bihar,384.44,807.94,6,33.15,5,low,1875.33
+Phulkari,Punjab,808.38,732.96,5,41.52,21,low,3074.36
+Blue Pottery,Rajasthan,559.84,346.67,3,57.87,20,high,1734.22
+Blue Pottery,Rajasthan,452.12,422.29,3,60.71,15,low,1572.52
+Blue Pottery,Rajasthan,340.48,575.86,4,52.11,5,high,1635.7
+Madhubani Painting,Bihar,332.12,550.48,4,73.02,1,medium,1261.99
+Phulkari,Punjab,376.73,1697.91,14,77.77,23,low,3555.82
+Bamboo Craft,Assam,346.01,235.63,2,59.93,25,low,962.34
+Bamboo Craft,Assam,298.13,184.51,2,50.47,7,medium,814.8
+Madhubani Painting,Bihar,270.2,501.27,4,40.35,15,medium,1371.64
+Blue Pottery,Rajasthan,596.62,449.31,4,87.4,18,high,1765.91
+Phulkari,Punjab,877.83,2100.96,12,74.49,14,low,4755.95
+Bamboo Craft,Assam,234.56,228.35,2,33.65,8,medium,755.88
+Blue Pottery,Rajasthan,367.93,504.24,3,51.39,14,low,1570.68
+Bamboo Craft,Assam,202.91,400.7,4,67.26,18,medium,901.59
+Phulkari,Punjab,634.54,951.4,7,73.29,14,medium,3276.36
+Madhubani Painting,Bihar,195.13,446.68,4,52.6,18,medium,1071.57
+Madhubani Painting,Bihar,361.02,412.69,4,75.7,13,medium,1330.03
+Bamboo Craft,Assam,305.36,133.42,1,28.76,7,medium,726.4
+Blue Pottery,Rajasthan,491.99,731.21,5,63.79,20,medium,2303.31
+Madhubani Painting,Bihar,205.56,1234.04,8,53.24,16,low,2045.5
+Phulkari,Punjab,483.28,1529.04,13,78.73,19,high,4833.39
+Phulkari,Punjab,853.25,1571.67,12,85.95,17,high,4769.47
+Bamboo Craft,Assam,166.94,287.84,2,48.36,14,medium,769.13
+Madhubani Painting,Bihar,251.24,1043.39,8,76.35,17,high,2615.43
+Blue Pottery,Rajasthan,449.44,750.13,7,80.92,7,medium,1928.17
+Bamboo Craft,Assam,111.34,101.31,1,44.63,26,low,394.33
+Blue Pottery,Rajasthan,521.63,654.08,5,74.45,19,medium,1894.63
+Madhubani Painting,Bihar,285.16,464.98,4,31.69,27,medium,1336.36
+Bamboo Craft,Assam,226.92,181.4,2,58.13,3,medium,561.14
+Blue Pottery,Rajasthan,233.44,407.37,3,56.26,18,medium,1148.52
+Phulkari,Punjab,795.19,1352.82,8,59.92,16,high,3965.62
+Madhubani Painting,Bihar,174.16,922.21,10,54.53,16,high,1900.53
+Bamboo Craft,Assam,288.89,247.95,2,65.17,11,medium,849.99
+Madhubani Painting,Bihar,224.9,1087.18,7,71.77,21,medium,2257.88
+Bamboo Craft,Assam,118.21,568.12,4,48.78,13,medium,937.27
+Blue Pottery,Rajasthan,358.24,370.68,3,65.81,26,medium,1448.23
+Madhubani Painting,Bihar,362.33,1202.43,8,49.16,21,medium,2778.69
+Blue Pottery,Rajasthan,415.04,618.61,4,85.25,16,medium,1797.82
+Phulkari,Punjab,515.28,1306.42,8,53.9,14,medium,3512.47
+Madhubani Painting,Bihar,354.41,995.97,9,41.77,16,low,2216.36
+Bamboo Craft,Assam,271.42,252.72,3,33.79,31,high,887.18
+Phulkari,Punjab,333.62,1264.97,11,68.21,19,high,4107.73
+Bamboo Craft,Assam,298.84,191.21,2,53.0,10,low,783.28
+Madhubani Painting,Bihar,408.57,540.89,4,55.4,10,low,1384.21
+Blue Pottery,Rajasthan,581.78,303.5,3,45.4,14,low,1562.35
+Blue Pottery,Rajasthan,309.61,587.64,5,69.75,18,medium,1550.34
+Blue Pottery,Rajasthan,551.73,336.48,3,110.01,15,low,1412.25
+Phulkari,Punjab,639.33,1665.39,10,97.52,17,high,5378.85
+Madhubani Painting,Bihar,267.73,1396.12,10,47.99,17,medium,2874.18
+Phulkari,Punjab,554.37,1749.55,11,62.34,18,low,3469.51
+Bamboo Craft,Assam,274.56,82.02,1,51.5,18,medium,500.59

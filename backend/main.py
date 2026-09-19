@@ -10,11 +10,14 @@ from fastapi.responses import RedirectResponse
 
 from .routers import (
     health,
+    auth,
     artisans,
     products,
     ai,
     pricing,
     buyers,
+    orders,
+    reviews,
     inquiries,
     passports,
     provenance,
@@ -55,16 +58,22 @@ app.add_middleware(
 
 # ── REGISTER ROUTERS ──────────────────────────────────────────────────
 app.include_router(health.router)
+app.include_router(auth.router)
 app.include_router(artisans.router)
 app.include_router(products.router)
 app.include_router(ai.router)
 app.include_router(pricing.router)
 app.include_router(buyers.router)
+app.include_router(orders.router)
+app.include_router(reviews.router)
 app.include_router(inquiries.router)
 app.include_router(passports.router)
 app.include_router(provenance.router)
 app.include_router(verification.router)
 app.include_router(admin.router)
+
+# Compatibility alias for direct /api/analyze-product callers
+app.add_api_route("/api/analyze-product", ai.analyze_product, methods=["POST"], include_in_schema=False)
 
 @app.get("/", include_in_schema=False)
 def root_redirect():

@@ -1,14 +1,40 @@
-# OS & Editor files
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Node dependencies
+node_modules/
+
+# Python cache and byte-code
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Environment and secrets
+.env
+.env.local
+
+# OS generated files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+
+# Logs
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE / Editor configs
 .vscode/
 .idea/
-
-# Dependencies
-node_modules/
-venv/
-__pycache__/
-*.pyc
-.env
-*.env
+*.sublime-project
+*.sublime-workspace

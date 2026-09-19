@@ -272,6 +272,7 @@ class AppStateStore {
 
     const isProtected = protectedScreens.includes(screen);
     const isAuthenticated = Boolean(this.data.artisanAuth?.isRegistered);
+    const isProfileCompleted = Boolean(this.data.artisanAuth?.profileCompleted);
 
     // 3. Unauthenticated user:
     // If not authenticated and trying to access a protected artisan route, redirect to Artisan Login ('onboarding')
@@ -281,6 +282,21 @@ class AppStateStore {
       this.data.activeArtisanScreen = 'onboarding';
       this.notify();
       return { success: false, redirectedTo: 'onboarding' };
+    }
+
+    // 4. Artisan Profile Completion Gate (FEATURE 2):
+    // An artisan must NOT be allowed to enter the Artisan Dashboard or create products until profile setup is completed.
+    if (isProtected && !isProfileCompleted && screen !== 'profile_step1' && screen !== 'artisan_id_card') {
+      console.warn('Profile incomplete! Redirecting artisan to setup-profile (/artisan/setup-profile)');
+      this.data.currentRole = 'artisan';
+      this.data.activeArtisanScreen = 'profile_step1';
+      this.notify();
+      return {
+        success: false,
+        code: 'PROFILE_INCOMPLETE',
+        redirectedTo: 'profile_step1',
+        message: 'Please complete your artisan profile before accessing the dashboard.'
+      };
     }
 
     // 4. Record navigation history for forward navigation
@@ -610,6 +626,7 @@ class AppStateStore {
 
     this.data.currentRole = 'artisan';
     this.data.artisanAuth.isRegistered = true;
+    this.data.artisanAuth.profileCompleted = true;
     this.data.artisanAuth.artisanProfile = newProfile;
     this.data.selectedArtisanId = generatedId;
 
@@ -631,6 +648,44 @@ class AppStateStore {
     return newProfile;
   }
 
+  completeArtisanProfileSetup(profileData) {
+    const artId = this.data.artisanAuth?.artisanProfile?.id || this.data.selectedArtisanId || `CRF-ART-${Date.now()}`;
+    const updated = {
+      id: artId,
+      artisan_id: artId,
+      name: profileData.name || 'Master Artisan',
+      email: profileData.email || this.data.artisanAuth?.email || '',
+      phone: profileData.phone || '',
+      craft: profileData.craft || 'Handicrafts',
+      craftCategory: profileData.craft || 'Handicrafts',
+      state: profileData.state || 'Assam',
+      district: profileData.district || '',
+      village: profileData.village || '',
+      location: `${profileData.village || profileData.district || ''}, ${profileData.state || 'India'}`.replace(/^,\s*/, ''),
+      experience: profileData.experience || 5,
+      bio: profileData.bio || '',
+      skills: profileData.skills || [profileData.craft],
+      profileCompleted: true
+    };
+
+    this.data.artisanAuth.isRegistered = true;
+    this.data.artisanAuth.profileCompleted = true;
+    this.data.artisanAuth.artisanProfile = updated;
+    this.data.selectedArtisanId = artId;
+
+    if (!this.data.artisans) this.data.artisans = [];
+    const idx = this.data.artisans.findIndex(a => a.id === artId);
+    if (idx >= 0) this.data.artisans[idx] = { ...this.data.artisans[idx], ...updated };
+    else this.data.artisans.push(updated);
+
+    // Save to backend
+    apiService.saveArtisanProfile(profileData, this.data.artisanAuth?.token).catch(err => console.warn('Profile sync notice:', err));
+
+    this.data.activeArtisanScreen = 'dashboard';
+    this.notify();
+    return updated;
+  }
+
   loginReturningArtisan(mobileNumber = '9876543210') {
     const cleanNumber = (mobileNumber || '').replace(/\D/g, '');
     const found = (this.data.savedArtisans || []).find(a => (a.mobileNumber || '').replace(/\D/g, '') === cleanNumber)
@@ -640,7 +695,8 @@ class AppStateStore {
 
     this.data.currentRole = 'artisan';
     this.data.artisanAuth.isRegistered = true;
-    this.data.artisanAuth.artisanProfile = { ...found };
+    this.data.artisanAuth.profileCompleted = true;
+    this.data.artisanAuth.artisanProfile = { ...found, profileCompleted: true };
     this.data.selectedArtisanId = found.id;
     this.data.activeArtisanScreen = 'dashboard';
     this.notify();
