@@ -38,21 +38,55 @@ export function renderAdminView(screen) {
     return renderScreenA1_AdminLogin();
   }
 
+  let content = '';
   switch (screen) {
     case 'login':
-      return renderScreenA1_AdminLogin();
+      content = renderScreenA1_AdminLogin();
+      break;
     case 'artisan_list':
-      return renderScreenA3_ArtisanVerificationQueue(state);
+      content = renderScreenA3_ArtisanVerificationQueue(state);
+      break;
     case 'product_list':
-      return renderScreenA4_ProductVerificationQueue(products);
+      content = renderScreenA4_ProductVerificationQueue(products);
+      break;
     case 'provenance_logs':
-      return renderScreenA5_ProvenanceLogs(products);
+      content = renderScreenA5_ProvenanceLogs(products);
+      break;
     case 'review_detail':
-      return renderScreenA6_DetailedReview(state.adminReviewingTarget || products[0]);
+      content = renderScreenA6_DetailedReview(state.adminReviewingTarget || products[0]);
+      break;
     case 'dashboard':
     default:
-      return renderScreenA2_AdminDashboard(state);
+      content = renderScreenA2_AdminDashboard(state);
+      break;
   }
+
+  if (state.showAdminSignOutModal) {
+    content += `
+      <div id="admin-signout-modal" style="position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px;">
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); max-width: 360px; width: 100%; padding: 24px; text-align: center; box-shadow: var(--shadow-lg);">
+          <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(185, 28, 28, 0.1); color: var(--terracotta); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
+            ${renderIcon('logOut', '', 24)}
+          </div>
+          <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 8px; color: var(--text-primary);">Sign Out</h3>
+          <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.4;">
+            Are you sure you want to sign out?
+          </p>
+
+          <div style="display: flex; gap: 10px;">
+            <button class="btn-secondary" style="flex: 1; padding: 10px;" onclick="window.cancelAdminSignOut()">
+              Cancel
+            </button>
+            <button class="btn-primary" style="flex: 1; padding: 10px; background: var(--terracotta); border-color: var(--terracotta);" onclick="window.confirmAdminSignOut()">
+              Sign Out
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  return content;
 }
 
 // Screen A1 — Admin Login Portal
@@ -117,8 +151,8 @@ function renderScreenA2_AdminDashboard(state) {
           <h2 style="font-size: 20px; font-weight: 800;">Verification Dashboard</h2>
           <div style="font-size: 13px; color: var(--text-secondary);">Logged in: <strong>${state.adminAuth?.adminId || 'admin'}</strong> (Demo Admin)</div>
         </div>
-        <button class="btn-secondary" style="padding: 6px 12px; font-size: 11px; width: auto; display: flex; align-items: center; gap: 4px;" onclick="window.logoutAdmin()">
-          ${renderIcon('shield', '', 12)} Sign Out
+        <button class="btn-secondary" style="padding: 6px 12px; font-size: 11px; width: auto; display: flex; align-items: center; gap: 4px;" onclick="window.requestAdminSignOut()">
+          ${renderIcon('logOut', '', 12)} Sign Out
         </button>
       </div>
 
@@ -393,8 +427,22 @@ window.submitAdminLogin = () => {
   }
 };
 
-window.logoutAdmin = () => {
+window.requestAdminSignOut = () => {
+  appState.data.showAdminSignOutModal = true;
+  appState.notify();
+};
+
+window.cancelAdminSignOut = () => {
+  delete appState.data.showAdminSignOutModal;
+  appState.notify();
+};
+
+window.confirmAdminSignOut = () => {
   appState.logoutAdmin();
+};
+
+window.logoutAdmin = () => {
+  window.requestAdminSignOut();
 };
 
 window.exitAdminMode = () => {

@@ -582,7 +582,7 @@ function renderScreen5_ProductCreationEntry() {
         <input type="file" id="artisan_image_file_input" accept="image/*" style="display: none;" onchange="window.handleProductImageFileInput(event)">
       </div>
 
-      <!-- Option 2: Capture with Camera -->
+      <!-- Option 2: Take Photo (Camera) -->
       <div class="craft-card craft-card-glow" style="padding: 20px 18px; margin-bottom: 20px; cursor: pointer; text-align: left; border: 1.5px solid var(--green); background: var(--green-pale); display: flex; align-items: center; gap: 14px; transition: transform 0.2s ease;"
            onclick="window.startProductCamera()">
         <div style="width: 46px; height: 46px; border-radius: var(--radius-sm); background: rgba(33, 80, 54, 0.15); color: var(--green); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
@@ -590,12 +590,12 @@ function renderScreen5_ProductCreationEntry() {
         </div>
         <div style="flex: 1;">
           <div style="font-size: 11px; font-weight: 700; color: var(--green); text-transform: uppercase;">Option 2</div>
-          <div style="font-weight: 700; font-size: 14px; color: var(--green);">Capture with Camera</div>
+          <div style="font-weight: 700; font-size: 14px; color: var(--green);">Take Photo — Capture with Camera</div>
           <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">Use laptop webcam to take a live photo</div>
         </div>
         <button class="btn-primary" style="width: auto; padding: 6px 12px; font-size: 12px; background: var(--green);"
                 onclick="event.stopPropagation(); window.startProductCamera()">
-          Capture with Camera
+          Take Photo
         </button>
       </div>
 
@@ -1374,17 +1374,10 @@ window.startProductCamera = async () => {
 };
 
 window.captureProductPhoto = () => {
-  const video = document.getElementById('product_webcam_video');
-  if (!video) return;
-
-  const canvas = document.createElement('canvas');
-  canvas.width = video.videoWidth || 640;
-  canvas.height = video.videoHeight || 480;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-  const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
-
-  appState.data.productCapturedPhoto = dataUrl;
+  // For the controlled CRAFTORA demo:
+  // While demonstrating the bamboo basket product in live camera preview,
+  // capture sets the preloaded bamboo basket enhanced reference image as the captured result.
+  appState.data.productCapturedPhoto = 'assets/bamboo_basket.png';
   appState.notify();
 };
 

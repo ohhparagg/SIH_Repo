@@ -326,6 +326,15 @@ class AppStateStore {
   }
 
   setBuyerScreen(screen, params = {}, options = {}) {
+    const protectedBuyerScreens = ['profile', 'connect', 'connect_success'];
+    const isBuyerAuth = Boolean(this.data.buyerAuth?.isRegistered || this.data.buyerAuth?.isGuest);
+    if (protectedBuyerScreens.includes(screen) && !isBuyerAuth) {
+      console.warn('Unauthenticated access attempt to protected buyer route:', screen, '-> Redirecting to Buyer Welcome');
+      this.data.activeBuyerScreen = 'welcome';
+      this.notify();
+      return;
+    }
+
     if (!options.isBack && !options.replace) {
       if (!this.data.navigationHistory) this.data.navigationHistory = { artisan: [], buyer: [], admin: [] };
       if (!Array.isArray(this.data.navigationHistory.buyer)) this.data.navigationHistory.buyer = [];
@@ -367,6 +376,12 @@ class AppStateStore {
       return;
     }
 
+    if (!this.data.adminAuth?.isLoggedIn) {
+      this.data.activeAdminScreen = 'login';
+      this.notify();
+      return;
+    }
+
     if (!options.isBack && !options.replace) {
       if (!this.data.navigationHistory) this.data.navigationHistory = { artisan: [], buyer: [], admin: [] };
       if (!Array.isArray(this.data.navigationHistory.admin)) this.data.navigationHistory.admin = [];
@@ -385,11 +400,7 @@ class AppStateStore {
       }
     }
 
-    if (!this.data.adminAuth?.isLoggedIn) {
-      this.data.activeAdminScreen = 'login';
-    } else {
-      this.data.activeAdminScreen = screen;
-    }
+    this.data.activeAdminScreen = screen;
     if (params.target) this.data.adminReviewingTarget = params.target;
     this.notify();
   }
@@ -436,8 +447,13 @@ class AppStateStore {
         }
       }
     } else if (role === 'buyer') {
+      const isBuyerAuth = Boolean(this.data.buyerAuth?.isRegistered || this.data.buyerAuth?.isGuest);
       const current = this.data.activeBuyerScreen;
-      if (current === 'welcome') {
+      if (current === 'welcome' || !isBuyerAuth) {
+        if (current !== 'welcome') {
+          this.setBuyerScreen('welcome', {}, { isBack: true });
+          return true;
+        }
         this.setRole('landing');
         return true;
       }
@@ -467,7 +483,11 @@ class AppStateStore {
       }
     } else if (role === 'admin') {
       const current = this.data.activeAdminScreen;
-      if (current === 'login') {
+      if (current === 'login' || !this.data.adminAuth?.isLoggedIn) {
+        if (current !== 'login') {
+          this.setAdminScreen('login', {}, { isBack: true });
+          return true;
+        }
         this.setRole('landing');
         return true;
       }
@@ -512,9 +532,13 @@ class AppStateStore {
   }
 
   logoutAdmin() {
+    delete this.data.showAdminSignOutModal;
     this.data.adminAuth.isLoggedIn = false;
     this.data.activeAdminScreen = 'login';
-    this.data.currentRole = 'landing';
+    this.data.currentRole = 'admin';
+    if (this.data.navigationHistory) {
+      this.data.navigationHistory.admin = [];
+    }
     this.notify();
   }
 
@@ -644,6 +668,7 @@ class AppStateStore {
 
   // Buyer Auth Flow Handlers
   startBuyerAuth() {
+    delete this.data.showBuyerSignOutModal;
     this.data.currentRole = 'buyer';
     this.data.activeBuyerScreen = 'welcome';
     this.data.buyerDraft = {
@@ -655,6 +680,31 @@ class AppStateStore {
     };
     this.data.buyerAuth.isRegistered = false;
     this.data.buyerAuth.isGuest = false;
+    this.notify();
+  }
+
+  signOutBuyer() {
+    delete this.data.showBuyerSignOutModal;
+    this.data.buyerAuth = {
+      isRegistered: false,
+      isGuest: false,
+      buyerProfile: null,
+      buyerName: '',
+      mobileNumber: '',
+      city: ''
+    };
+    this.data.buyerDraft = {
+      mobileNumber: '',
+      otp: '',
+      name: '',
+      city: '',
+      buyerId: ''
+    };
+    this.data.currentRole = 'buyer';
+    this.data.activeBuyerScreen = 'welcome';
+    if (this.data.navigationHistory) {
+      this.data.navigationHistory.buyer = [];
+    }
     this.notify();
   }
 

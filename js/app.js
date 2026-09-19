@@ -75,4 +75,9 @@ document.addEventListener('DOMContentLoaded', () => {
   appState.subscribe(() => {
     renderApp();
   });
+
+  // Handle browser native Back button
+  window.addEventListener('popstate', () => {
+    appState.goBack();
+  });
 });

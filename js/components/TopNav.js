@@ -42,7 +42,7 @@ export function renderTopNav(showBack = false) {
 
       <div style="display: flex; align-items: center; gap: 8px;">
         ${role === 'admin' && state.adminAuth?.isLoggedIn ? `
-          <button class="btn-secondary" style="padding: 4px 8px; font-size: 11px; height: auto; border-radius: var(--radius-xs);" onclick="window.logoutAdmin()" title="Sign Out">
+          <button class="btn-secondary" style="padding: 4px 8px; font-size: 11px; height: auto; border-radius: var(--radius-xs);" onclick="window.requestAdminSignOut()" title="Sign Out">
             Sign Out
           </button>
         ` : ''}
