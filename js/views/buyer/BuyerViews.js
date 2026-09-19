@@ -150,13 +150,15 @@ function renderScreen2B_BuyerMobile() {
       </p>
 
       <div class="craft-card" style="text-align: left; max-width: 340px; margin: 0 auto 20px;">
+        <div id="buyer_mobile_error" style="display:none; padding:8px 10px; background:var(--danger-pale); border:1px solid var(--danger); border-radius:var(--radius-sm); color:var(--danger); font-size:12px; margin-bottom:12px; font-weight:600;"></div>
+
         <div class="form-group">
           <label class="form-label">Mobile Number</label>
           <div style="display: flex; gap: 8px;">
             <span style="display: flex; align-items: center; padding: 10px 12px; background: var(--bg-elevated); border: 1.5px solid var(--border-light); border-radius: var(--radius-sm); font-size: 14px; font-weight: 700; color: var(--text-primary);">
               🇮🇳 +91
             </span>
-            <input type="tel" id="buyer_mobile_input" class="form-input" maxlength="10"
+            <input type="tel" id="buyer_mobile_input" class="form-input" maxlength="15"
                    value="${draft.mobileNumber || ''}" placeholder="10-digit number" style="font-size: 15px; letter-spacing: 0.05em; font-weight: 600;">
           </div>
         </div>
@@ -275,13 +277,15 @@ function renderScreen2B_BuyerSignIn() {
       </p>
 
       <div class="craft-card" style="text-align: left; max-width: 340px; margin: 0 auto 20px;">
+        <div id="buyer_signin_error" style="display:none; padding:8px 10px; background:var(--danger-pale); border:1px solid var(--danger); border-radius:var(--radius-sm); color:var(--danger); font-size:12px; margin-bottom:12px; font-weight:600;"></div>
+
         <div class="form-group">
           <label class="form-label">Registered Mobile Number</label>
           <div style="display: flex; gap: 8px;">
             <span style="display: flex; align-items: center; padding: 10px 12px; background: var(--bg-elevated); border: 1.5px solid var(--border-light); border-radius: var(--radius-sm); font-size: 14px; font-weight: 700; color: var(--text-primary);">
               🇮🇳 +91
             </span>
-            <input type="tel" id="buyer_signin_phone" class="form-input" maxlength="10"
+            <input type="tel" id="buyer_signin_phone" class="form-input" maxlength="15"
                    value="9876543210" placeholder="10-digit number" style="font-size: 15px; letter-spacing: 0.05em; font-weight: 600;">
           </div>
         </div>
@@ -896,7 +900,19 @@ window.continueAsGuest = () => {
 };
 
 window.submitBuyerMobile = () => {
-  const phone = document.getElementById('buyer_mobile_input')?.value?.trim() || '';
+  const phone = (typeof document !== 'undefined' ? document.getElementById('buyer_mobile_input')?.value?.trim() : '') || appState.data.buyerDraft?.mobileNumber || '';
+  const errEl = typeof document !== 'undefined' ? document.getElementById('buyer_mobile_error') : null;
+  if (!/^[0-9]{10}$/.test(phone)) {
+    if (errEl) {
+      errEl.style.display = 'block';
+      errEl.textContent = 'Enter a valid 10-digit mobile number.';
+    } else if (typeof alert === 'function') {
+      alert('Enter a valid 10-digit mobile number.');
+    }
+    return;
+  }
+  if (errEl) errEl.style.display = 'none';
+
   if (!appState.data.buyerDraft) appState.data.buyerDraft = {};
   appState.data.buyerDraft.mobileNumber = phone;
   appState.data.buyerDraft.isSignIn = false;
@@ -904,13 +920,13 @@ window.submitBuyerMobile = () => {
 };
 
 window.verifyBuyerOTP = () => {
-  const otp = document.getElementById('buyer_otp_input')?.value?.trim() || '1234';
-  const errEl = document.getElementById('buyer_otp_error');
+  const otp = (typeof document !== 'undefined' ? document.getElementById('buyer_otp_input')?.value?.trim() : '') || appState.data.buyerDraft?.otp || '1234';
+  const errEl = typeof document !== 'undefined' ? document.getElementById('buyer_otp_error') : null;
   if (otp.length !== 4) {
     if (errEl) {
       errEl.style.display = 'block';
       errEl.textContent = 'Please enter a 4-digit OTP (Demo OTP: 1234)';
-    } else {
+    } else if (typeof alert === 'function') {
       alert('Please enter a 4-digit OTP (Demo OTP: 1234)');
     }
     return;
@@ -926,15 +942,27 @@ window.verifyBuyerOTP = () => {
 };
 
 window.submitBuyerRegistration = () => {
-  const name = document.getElementById('buyer_reg_name')?.value?.trim() || 'Valued Buyer';
-  const city = document.getElementById('buyer_reg_city')?.value?.trim() || 'India';
+  const name = (typeof document !== 'undefined' ? document.getElementById('buyer_reg_name')?.value?.trim() : '') || 'Valued Buyer';
+  const city = (typeof document !== 'undefined' ? document.getElementById('buyer_reg_city')?.value?.trim() : '') || 'India';
   const phone = appState.data.buyerDraft?.mobileNumber || '9876543210';
 
   appState.completeBuyerRegistration(name, city, phone);
 };
 
 window.submitBuyerSignIn = () => {
-  const phone = document.getElementById('buyer_signin_phone')?.value?.trim() || '9876543210';
+  const phone = (typeof document !== 'undefined' ? document.getElementById('buyer_signin_phone')?.value?.trim() : '') || appState.data.buyerDraft?.mobileNumber || '9876543210';
+  const errEl = typeof document !== 'undefined' ? document.getElementById('buyer_signin_error') : null;
+  if (!/^[0-9]{10}$/.test(phone)) {
+    if (errEl) {
+      errEl.style.display = 'block';
+      errEl.textContent = 'Enter a valid 10-digit mobile number.';
+    } else if (typeof alert === 'function') {
+      alert('Enter a valid 10-digit mobile number.');
+    }
+    return;
+  }
+  if (errEl) errEl.style.display = 'none';
+
   if (!appState.data.buyerDraft) appState.data.buyerDraft = {};
   appState.data.buyerDraft.mobileNumber = phone;
   appState.data.buyerDraft.isSignIn = true;

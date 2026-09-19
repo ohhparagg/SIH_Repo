@@ -11,7 +11,7 @@ export function renderBottomNav() {
 
   if (role === 'artisan') {
     const active = state.activeArtisanScreen;
-    if (['onboarding', 'onboarding_otp', 'profile_step1', 'artisan_id_card'].includes(active)) {
+    if (['onboarding', 'onboarding_otp', 'profile_step1'].includes(active)) {
       return '';
     }
     return `

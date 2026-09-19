@@ -23,8 +23,51 @@ if _env_file.exists():
 
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
-GROQ_PRIMARY_MODEL = os.environ.get("GROQ_MODEL", "openai/gpt-oss-120b")
-GROQ_FALLBACK_MODEL = "openai/gpt-oss-20b"
+GROQ_VISION_MODEL = os.environ.get("GROQ_VISION_MODEL", "llama-3.2-11b-vision-preview")
+GROQ_PRIMARY_MODEL = os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
+GROQ_FALLBACK_MODEL = "llama-3.1-8b-instant"
+
+def _query_groq_vision(image_url: str, prompt: str, timeout: float = 12.0) -> Optional[Dict[str, Any]]:
+    if not GROQ_API_KEY or not image_url:
+        return None
+    try:
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+
+        payload = {
+            "model": GROQ_VISION_MODEL,
+            "messages": [
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": prompt},
+                        {"type": "image_url", "image_url": {"url": image_url}}
+                    ]
+                }
+            ],
+            "temperature": 0.2
+        }
+
+        req = urllib.request.Request(
+            GROQ_API_URL,
+            headers={
+                "Authorization": f"Bearer {GROQ_API_KEY}",
+                "Content-Type": "application/json",
+                "User-Agent": "CRAFTORA-AI/1.0"
+            },
+            data=json.dumps(payload).encode("utf-8")
+        )
+
+        with urllib.request.urlopen(req, context=ctx, timeout=timeout) as res:
+            data = json.loads(res.read().decode("utf-8"))
+            if data.get("choices") and len(data["choices"]) > 0:
+                raw_text = data["choices"][0]["message"]["content"]
+                cleaned = re.sub(r"^```json\s*|\s*```$", "", raw_text.strip(), flags=re.MULTILINE)
+                return json.loads(cleaned)
+    except Exception as e:
+        print(f"Notice: Groq Vision AI query error: {e}")
+    return None
 
 def _query_groq(messages: List[Dict[str, str]], model: str = GROQ_PRIMARY_MODEL, timeout: float = 6.0) -> Optional[Dict[str, Any]]:
     if not GROQ_API_KEY:
@@ -125,88 +168,79 @@ class AIService:
         filename: Optional[str] = None,
         artisan_id: Optional[str] = None,
         artisan_craft: Optional[str] = None,
-        language: str = "EN"
+        language: str = "EN",
+        image_url: Optional[str] = None
     ) -> Dict[str, Any]:
         """
-        Demo AI vision analyzer.
-        Inspects filename hints and artisan context to produce realistic catalogue data.
+        AI vision analyzer with multimodal vision support.
+        Supports unseen products via Groq Llama-3.2-Vision and provides honest service status.
         """
+        # If real image data is provided, attempt true vision analysis first
+        if image_url and GROQ_API_KEY:
+            vision_prompt = (
+                f"You are an expert product analyzer and cataloguer. Analyze the uploaded product image. "
+                f"Language requirement: {language.upper()}. "
+                f"Return valid JSON only with keys:\n"
+                f"- product_name: Accurate, concise title (e.g. Ballpoint Pen, Leather Shoe, Bamboo Basket)\n"
+                f"- category: Accurate category (e.g. Writing Instrument, Footwear, Drinkware, Bamboo Craft). If uncertain, write 'Needs Review'\n"
+                f"- craft_type: Technique or sub-category if applicable, or 'N/A'\n"
+                f"- materials: Array of visible material strings (e.g. ['Plastic', 'Metal']). If not determinable, write ['Material could not be reliably determined from the image.']\n"
+                f"- description: Objective description based on visible characteristics (2 sentences)\n"
+                f"- tags: Array of 4-5 relevant search tags\n"
+                f"- confidence: 'High confidence' or 'Needs review' or 'Low confidence'\n"
+                f"- suggested_price: Indicative fair Indian Rupee integer price\n"
+                f"CRITICAL: Do NOT force everyday non-handicraft objects into crafts. Never invent details."
+            )
+            v_res = _query_groq_vision(image_url, vision_prompt)
+            if v_res and isinstance(v_res, dict) and v_res.get("product_name"):
+                return {
+                    "analysisStatus": "success",
+                    "ai_generated": True,
+                    "ai_engine": "Groq Llama-3.2 Vision Model",
+                    "product_name": str(v_res.get("product_name", "Needs Review")),
+                    "category": str(v_res.get("category", "Needs Review")),
+                    "craft_type": str(v_res.get("craft_type", "Standard")),
+                    "description": str(v_res.get("description", "AI-generated description based on visible characteristics.")),
+                    "materials": v_res.get("materials") if isinstance(v_res.get("materials"), list) else [str(v_res.get("materials", "N/A"))],
+                    "tags": v_res.get("tags") if isinstance(v_res.get("tags"), list) else ["product"],
+                    "confidence": v_res.get("confidence", "High confidence"),
+                    "suggested_price": v_res.get("suggested_price", 650),
+                    "isDemoFallback": False
+                }
+
         name_lower = (filename or "").lower()
         craft_lower = (artisan_craft or "").lower()
         combined = f"{name_lower} {craft_lower}"
 
-        selected_key = "bamboo"
-        for key in CRAFT_KNOWLEDGE_BASE:
-            if key in combined:
-                selected_key = key
-                break
-        
-        info = CRAFT_KNOWLEDGE_BASE[selected_key]
+        is_bamboo = "bamboo" in combined or "basket" in combined
 
-        if language.upper() == "HI":
-            descriptions = {
-                "bamboo": "पारंपरिक असमी बुनाई तकनीक से बना हस्तनिर्मित पर्यावरण-अनुकूल बाँस का उत्पाद।",
-                "pottery": "पारंपरिक जयपुरी नीली मिट्टी के बर्तन, प्राकृतिक रंगों और हाथ की नक्काशी के साथ।",
-                "madhubani": "प्राकृतिक रंगों और हस्तनिर्मित कागज पर बनी पारंपरिक मधुबनी/मिथिला लोक कला।",
-                "textile": "प्राकृतिक धागों और पारंपरिक करघे से बुना गया प्रामाणिक हथकरघा वस्त्र।",
-                "terracotta": "प्राकृतिक मिट्टी से हाथ से गढ़ी गई सुंदर टेराकोटा कलाकृति।"
-            }
-            desc = descriptions.get(selected_key, info["description"])
-        else:
-            desc = info["description"]
-
-        # Attempt AI enhancement via Groq LLM
-        groq_prompt = (
-            f"You are an AI cataloguer for authentic Indian handicrafts. "
-            f"An artisan has uploaded an image of a {selected_key} craft (filename: '{filename}', category hint: '{artisan_craft or selected_key}'). "
-            f"Language requirement: {language.upper()}. "
-            f"Return JSON strictly with these keys:\n"
-            f"- product_name: A marketable, authentic title\n"
-            f"- category: One of ['Bamboo Craft', 'Blue Pottery', 'Madhubani Painting', 'Handloom Weaving', 'Terracotta Clay Work']\n"
-            f"- craft_type: Authentic artisan sub-genre technique\n"
-            f"- description: Rich, appealing marketing description (2-3 sentences, in {language.upper()})\n"
-            f"- materials: Array of natural raw material strings\n"
-            f"- tags: Array of 5 short search tags\n"
-            f"- production_time: Estimated crafting time (e.g. '2-3 Days')\n"
-            f"- confidence: A float between 0.92 and 0.98\n"
-            f"- suggested_price: An indicative fair Indian Rupee price (integer)\n"
-        )
-        groq_res = _query_groq([
-            {"role": "system", "content": "You are a master evaluator of Indian regional crafts and heritage art. Output valid JSON only."},
-            {"role": "user", "content": groq_prompt}
-        ])
-
-        if groq_res and isinstance(groq_res, dict) and groq_res.get("product_name"):
+        # If this is specifically the bamboo basket demo:
+        if is_bamboo:
+            info = CRAFT_KNOWLEDGE_BASE["bamboo"]
+            desc = "पारंपरिक असमी बुनाई तकनीक से बना हस्तनिर्मित पर्यावरण-अनुकूल बाँस का उत्पाद।" if language.upper() == "HI" else info["description"]
             return {
+                "analysisStatus": "success",
                 "ai_generated": True,
                 "ai_mode": "demo",
-                "ai_engine": "Groq Powered (OpenAI GPT-OSS-120B Multimodal Engine)",
-                "ai_model_label": "Groq Llama-3 / GPT-OSS Multimodal Vision Engine",
-                "product_name": str(groq_res.get("product_name", info["default_title"])),
-                "category": str(groq_res.get("category", info["category"])),
-                "craft_type": str(groq_res.get("craft_type", info["craft_type"])),
-                "description": str(groq_res.get("description", desc)),
-                "materials": groq_res.get("materials") if isinstance(groq_res.get("materials"), list) else info["materials"],
-                "tags": groq_res.get("tags") if isinstance(groq_res.get("tags"), list) else info["tags"],
-                "production_time": str(groq_res.get("production_time", info["production_time"])),
-                "confidence": float(groq_res.get("confidence", info["confidence"])),
-                "suggested_price": groq_res.get("suggested_price", 650),
-                "disclaimer": "AI Generated via Groq Intelligence. Artisan can edit and override all generated attributes."
+                "ai_model_label": "CRAFTORA Vision Demo Engine (Bamboo Basket Reference)",
+                "product_name": info["default_title"],
+                "category": info["category"],
+                "craft_type": info["craft_type"],
+                "description": desc,
+                "materials": info["materials"],
+                "tags": info["tags"],
+                "production_time": info["production_time"],
+                "confidence": "High confidence",
+                "suggested_price": 650,
+                "isDemoFallback": True,
+                "disclaimer": "AI Generated / Demo AI. Artisan can edit and override all generated attributes."
             }
 
+        # For any unseen product without vision API key:
         return {
-            "ai_generated": True,
-            "ai_mode": "demo",
-            "ai_model_label": "CRAFTORA Vision Demo Engine (Rule-based Multimodal Mock)",
-            "product_name": info["default_title"],
-            "category": info["category"],
-            "craft_type": info["craft_type"],
-            "description": desc,
-            "materials": info["materials"],
-            "tags": info["tags"],
-            "production_time": info["production_time"],
-            "confidence": info["confidence"],
-            "disclaimer": "AI Generated / Demo AI. Artisan can edit and override all generated attributes."
+            "analysisStatus": "error",
+            "errorType": "service_unavailable",
+            "message": "AI analysis is temporarily unavailable. Vision API key (GROQ_API_KEY) is required on server for new/unseen objects."
         }
 
     @staticmethod

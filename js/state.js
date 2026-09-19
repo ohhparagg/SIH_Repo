@@ -542,6 +542,34 @@ class AppStateStore {
     this.notify();
   }
 
+  signOutArtisan() {
+    delete this.data.showArtisanSignOutModal;
+    this.data.artisanAuth = {
+      isRegistered: false,
+      artisanProfile: null
+    };
+    this.data.onboardingDraft = {
+      mobileNumber: '',
+      otp: '',
+      name: '',
+      craftCategory: '',
+      location: '',
+      artisanId: '',
+      voiceTranscript: '',
+      isVoiceExtracted: false
+    };
+    this.data.currentRole = 'artisan';
+    this.data.activeArtisanScreen = 'onboarding';
+    if (this.data.navigationHistory) {
+      this.data.navigationHistory.artisan = [];
+    }
+    this.notify();
+  }
+
+  logoutArtisan() {
+    this.signOutArtisan();
+  }
+
   // Artisan Auth Flow Handlers
   startNewArtisanRegistration() {
     this.data.currentRole = 'artisan';

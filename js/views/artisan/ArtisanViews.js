@@ -9,6 +9,7 @@ import { renderDigitalProductPassportCard } from '../../components/DigitalProduc
 import { renderAIChecklist } from '../../components/AIChecklist.js';
 import { renderIcon } from '../../components/Icons.js';
 import { apiService } from '../../services/api.js';
+import { analyzeProductImagePipeline } from '../../services/aiProductAnalysis.js';
 
 let _productCameraStream = null;
 
@@ -107,7 +108,35 @@ export function renderArtisanView(screen) {
     }
   }
 
+  if (state.showArtisanSignOutModal) {
+    html += renderArtisanSignOutModal();
+  }
+
   return html;
+}
+
+function renderArtisanSignOutModal() {
+  return `
+    <div id="artisan-signout-modal" style="position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px;">
+      <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); max-width: 360px; width: 100%; padding: 24px; text-align: center; box-shadow: var(--shadow-lg);">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(185, 28, 28, 0.1); color: var(--terracotta); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
+          ${renderIcon('logOut', '', 24)}
+        </div>
+        <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 8px; color: var(--text-primary);">Sign Out</h3>
+        <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.4;">
+          Are you sure you want to sign out?
+        </p>
+        <div style="display: flex; gap: 10px;">
+          <button class="btn-secondary" style="flex: 1; padding: 10px;" onclick="window.cancelArtisanSignOut()">
+            Cancel
+          </button>
+          <button class="btn-primary" style="flex: 1; padding: 10px; background: var(--terracotta); border-color: var(--terracotta);" onclick="window.confirmArtisanSignOut()">
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 function renderDeleteConfirmationModal(product) {
@@ -212,13 +241,15 @@ function renderScreen2_MobileInput() {
       </div>
 
       <div class="craft-card" style="text-align: left; max-width: 340px; margin: 0 auto 20px;">
+        <div id="artisan_mobile_error" style="display:none; padding:8px 10px; background:var(--danger-pale); border:1px solid var(--danger); border-radius:var(--radius-sm); color:var(--danger); font-size:12px; margin-bottom:12px; font-weight:600;"></div>
+
         <div class="form-group">
           <label class="form-label">${isSignIn ? 'Registered Mobile Number' : 'Mobile Number'}</label>
           <div style="display: flex; gap: 8px;">
             <span style="display: flex; align-items: center; padding: 10px 12px; background: var(--bg-elevated); border: 1.5px solid var(--border-light); border-radius: var(--radius-sm); font-size: 14px; font-weight: 700; color: var(--text-primary);">
               🇮🇳 +91
             </span>
-            <input type="tel" id="artisan_mobile_input" class="form-input" maxlength="10"
+            <input type="tel" id="artisan_mobile_input" class="form-input" maxlength="15"
                    value="${draft.mobileNumber || (isSignIn ? '9876543210' : '')}" placeholder="10-digit number" style="font-size: 15px; letter-spacing: 0.05em; font-weight: 600;">
           </div>
         </div>
@@ -451,6 +482,9 @@ function renderScreen3_ArtisanIdCard() {
         <button class="btn-primary" onclick="window.enterArtisanDashboard()">
           Go to Artisan Dashboard ${renderIcon('arrowRight', '', 16)}
         </button>
+        <button class="btn-secondary" style="border-color: var(--terracotta); color: var(--terracotta); font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; margin-top: 4px;" onclick="window.requestArtisanSignOut()">
+          ${renderIcon('logOut', '', 16)} Sign Out
+        </button>
       </div>
     </div>
   `;
@@ -622,37 +656,151 @@ function renderScreen6_AIAnalysis() {
   const state = appState.data;
   const draft = state.productCreationDraft || {};
   const currentProduct = (state.products || []).find(p => p.id === state.selectedProductId) || draft;
-  const displayImage = draft.imageUrl || currentProduct.imageUrl || 'assets/bamboo_basket.png';
-  const displayTitle = draft.title || currentProduct.title || 'Handcrafted Bamboo Basket';
-  const displayCategory = draft.category || currentProduct.category || 'Bamboo Craft';
-  const displayMaterials = Array.isArray(draft.materials) ? draft.materials.join(', ') : (draft.materials || 'Natural Bamboo');
+  const pipeline = state.aiAnalysisPipeline || { status: 'success' };
+  const displayImage = pipeline.enhancedImage || draft.imageUrl || currentProduct.imageUrl || 'assets/bamboo_basket.png';
+  const displayTitle = currentProduct.title || draft.title || 'Handcrafted Bamboo Basket';
+  const displayCategory = currentProduct.category || draft.category || 'Bamboo Craft';
+  const displayMaterials = Array.isArray(currentProduct.materials)
+    ? currentProduct.materials.join(', ')
+    : (Array.isArray(draft.materials) ? draft.materials.join(', ') : (draft.materials || 'Natural Bamboo'));
+  const confidence = currentProduct.confidence || pipeline.data?.confidence || 'Needs review';
 
+  // 1. Analyzing State
+  if (pipeline.status === 'analyzing') {
+    return `
+      <div style="padding: 24px 20px; text-align: center;">
+        <h2 style="font-size: 20px; margin-bottom: 12px; color: var(--copper); display: flex; align-items: center; justify-content: center; gap: 8px;">
+          ${renderIcon('sparkles', '', 20)} Analyzing Your Product
+        </h2>
+        <div style="border-radius: var(--radius-md); overflow: hidden; max-height: 220px; margin: 0 auto 16px; border: 1.5px solid var(--border-green); background: #000;">
+          <img src="${displayImage}" alt="Uploaded Image" style="width: 100%; height: 220px; object-fit: cover;">
+        </div>
+        <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+          CRAFTORA AI Vision is inspecting visual contours, materials, and category...
+        </div>
+        <div style="display: inline-flex; align-items: center; gap: 8px; background: var(--bg-elevated); padding: 8px 16px; border-radius: var(--radius-full); font-size: 12px; color: var(--copper); font-weight: 700;">
+          <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--gold); animation: pulse 1.2s infinite;"></span>
+          Running Multimodal Vision Analysis...
+        </div>
+      </div>
+    `;
+  }
+
+  // 2. Quality Check Failed State
+  if (pipeline.status === 'quality_failed') {
+    return `
+      <div style="padding: 24px 20px; text-align: center; max-width: 400px; margin: 0 auto;">
+        <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(185, 28, 28, 0.1); color: var(--terracotta); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
+          ${renderIcon('alertCircle', '', 28)}
+        </div>
+        <h2 style="font-size: 19px; font-weight: 800; margin-bottom: 6px; color: var(--text-primary);">
+          Image Quality Insufficient
+        </h2>
+        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.4;">
+          Image quality is insufficient for reliable analysis.<br>
+          <span style="font-size: 12px; color: var(--terracotta); font-weight: 600;">${pipeline.message || 'The photo is too dark, blurry, or lacks clear contours.'}</span>
+        </p>
+
+        <div style="border-radius: var(--radius-md); overflow: hidden; max-height: 160px; margin: 0 auto 20px; border: 1px solid var(--border-light); opacity: 0.85;">
+          <img src="${pipeline.rawImage || displayImage}" alt="Uploaded Image" style="width: 100%; height: 160px; object-fit: cover;">
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <button class="btn-primary" onclick="window.startProductCamera()">
+            ${renderIcon('camera', '', 16)} Retake Photo
+          </button>
+          <button class="btn-secondary" onclick="document.getElementById('artisan_image_file_input_fallback').click()">
+            ${renderIcon('image', '', 16)} Upload Another Image
+          </button>
+          <input type="file" id="artisan_image_file_input_fallback" accept="image/*" style="display: none;" onchange="window.handleProductImageFileInput(event)">
+          <button class="btn-secondary" style="border-color: var(--border-medium); color: var(--text-secondary);" onclick="window.continueWithManualEntry()">
+            Continue with Manual Entry →
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  // 3. Service Error State
+  if (pipeline.status === 'error') {
+    return `
+      <div style="padding: 24px 20px; text-align: center; max-width: 400px; margin: 0 auto;">
+        <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(217, 119, 6, 0.1); color: var(--gold); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
+          ${renderIcon('alertCircle', '', 28)}
+        </div>
+        <h2 style="font-size: 19px; font-weight: 800; margin-bottom: 6px; color: var(--text-primary);">
+          AI analysis is currently unavailable.
+        </h2>
+        <div style="font-size: 12px; font-weight: 600; color: var(--gold); margin-bottom: 8px;">(AI Analysis Unavailable)</div>
+        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.4;">
+          AI analysis is currently unavailable.<br>
+          <span style="font-size: 11px; color: var(--text-muted);">${pipeline.message || 'Vision service did not return a response.'}</span>
+        </p>
+
+        <div style="border-radius: var(--radius-md); overflow: hidden; max-height: 160px; margin: 0 auto 20px; border: 1px solid var(--border-light);">
+          <img src="${pipeline.rawImage || displayImage}" alt="Uploaded Image" style="width: 100%; height: 160px; object-fit: cover;">
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <button class="btn-primary" onclick="window.retryAIAnalysis()">
+            ${renderIcon('rotateCcw', '', 16)} Retry
+          </button>
+          <button class="btn-secondary" onclick="document.getElementById('artisan_image_file_input_fallback').click()">
+            ${renderIcon('image', '', 16)} Upload Another Image
+          </button>
+          <input type="file" id="artisan_image_file_input_fallback" accept="image/*" style="display: none;" onchange="window.handleProductImageFileInput(event)">
+          <button class="btn-secondary" style="border-color: var(--border-medium); color: var(--text-secondary);" onclick="window.continueWithManualEntry()">
+            Enter Details Manually →
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  const displayTags = Array.isArray(currentProduct.tags)
+    ? currentProduct.tags.join(', ')
+    : (Array.isArray(draft.tags) ? draft.tags.join(', ') : (draft.tags || 'craft, handmade'));
+
+  // 4. Successful Structured Output State
   return `
     <div style="padding: 24px 20px; text-align: center;">
-      <h2 style="font-size: 20px; margin-bottom: 12px; color: var(--copper); display: flex; align-items: center; justify-content: center; gap: 8px;">
-        ${renderIcon('sparkles', '', 20)} Creating Your Listing
+      <h2 style="font-size: 20px; margin-bottom: 4px; color: var(--copper); display: flex; align-items: center; justify-content: center; gap: 8px;">
+        ${renderIcon('sparkles', '', 20)} AI Generated — Review Before Publishing
       </h2>
+      <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 14px;">
+        AI Generated — Review Before Publishing
+      </p>
 
-      <div style="border-radius: var(--radius-md); overflow: hidden; max-height: 200px; margin: 0 auto 16px; border: 1px solid var(--border-green); background: #000;">
+      <div style="position: relative; border-radius: var(--radius-md); overflow: hidden; max-height: 200px; margin: 0 auto 16px; border: 1px solid var(--border-green); background: #000;">
         <img src="${displayImage}" alt="${displayTitle}" style="width: 100%; height: 200px; object-fit: cover;">
-      </div>
-
-      <div style="font-size: 13px; color: var(--text-secondary); font-style: italic; margin-bottom: 16px;">
-        CRAFTORA AI is analyzing your craft...
+        <span class="badge-pill badge-gold" style="position: absolute; bottom: 8px; left: 8px;">
+          ${renderIcon('sparkles', '', 12)} Image Enhanced
+        </span>
+        <span class="badge-pill badge-emerald" style="position: absolute; bottom: 8px; right: 8px;">
+          ${confidence}
+        </span>
       </div>
 
       ${renderAIChecklist(true)}
 
       <div class="craft-card" style="text-align: left; margin-top: 16px;">
-        <div style="font-size: 11px; font-weight: 700; color: var(--text-copper); text-transform: uppercase;">
-          AI Suggested — Draft Preview
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <div style="font-size: 11px; font-weight: 700; color: var(--text-copper); text-transform: uppercase;">
+            Structured AI Output
+          </div>
+          <span class="badge-pill badge-emerald" style="font-size: 10px;">${confidence}</span>
         </div>
-        <div style="font-size: 15px; font-weight: 700; margin-top: 4px;">${displayTitle}</div>
-        <div style="font-size: 12px; color: var(--text-secondary);">Category: ${displayCategory} • Material: ${displayMaterials}</div>
+        <div style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">${displayTitle}</div>
+        <div style="font-size: 12px; color: var(--copper); font-weight: 600; margin-bottom: 2px;"><strong>Category:</strong> ${displayCategory}</div>
+        <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;"><strong>Materials:</strong> ${displayMaterials}</div>
+        <div style="font-size: 12px; color: var(--text-muted); font-style: italic; line-height: 1.4; margin-bottom: 6px;"><strong>Description:</strong> ${currentProduct.description || draft.description || ''}</div>
+        <div style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">
+          <strong style="color: var(--text-primary);">Tags:</strong> ${displayTags}
+        </div>
       </div>
 
       <button class="btn-primary" style="margin-top: 16px;" onclick="window.navArtisan('review_product')">
-        ${renderIcon('sparkles', '', 16)} AI Suggested — Review & Edit ${renderIcon('arrowRight', '', 16)}
+        ${renderIcon('sparkles', '', 16)} Review & Edit ${renderIcon('arrowRight', '', 16)}
       </button>
     </div>
   `;
@@ -773,9 +921,10 @@ function renderScreen9_MarketMatches(product) {
         </div>
       </div>
 
-      <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-copper); margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+      <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-copper); margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
         ${renderIcon('sparkles', '', 14)} AI-Assisted Buyer Matching
       </div>
+      <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">Potential Buyer Matches based on your product profile:</div>
 
       ${product.buyerMatches.map(m => `
         <div class="craft-card" style="margin-bottom: 12px; border-left: 3px solid var(--text-copper);">
@@ -839,10 +988,10 @@ function renderScreen11_Provenance(product) {
   return `
     <div style="padding: 24px 20px;">
       <h2 style="font-size: 20px; margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
-        ${renderIcon('shield', '', 20)} Provenance Record
+        ${renderIcon('shield', '', 20)} Blockchain-Backed Provenance Record
       </h2>
       <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
-        Product history & verification events.
+        Product history &amp; verification events.
       </p>
 
       <div class="craft-card">
@@ -1285,9 +1434,21 @@ window.setArtisanAuthMode = (mode) => {
 };
 
 window.submitArtisanMobile = (mode) => {
-  const phone = document.getElementById('artisan_mobile_input')?.value?.trim() || '';
+  const phone = (typeof document !== 'undefined' ? document.getElementById('artisan_mobile_input')?.value?.trim() : '') || appState.data.onboardingDraft?.mobileNumber || '';
+  const errEl = typeof document !== 'undefined' ? document.getElementById('artisan_mobile_error') : null;
+  if (!/^[0-9]{10}$/.test(phone)) {
+    if (errEl) {
+      errEl.style.display = 'block';
+      errEl.textContent = 'Enter a valid 10-digit mobile number.';
+    } else if (typeof alert === 'function') {
+      alert('Enter a valid 10-digit mobile number.');
+    }
+    return;
+  }
+  if (errEl) errEl.style.display = 'none';
+
   if (!appState.data.onboardingDraft) appState.data.onboardingDraft = {};
-  if (phone) appState.data.onboardingDraft.mobileNumber = phone;
+  appState.data.onboardingDraft.mobileNumber = phone;
   if (mode) appState.data.onboardingDraft.authMode = mode;
   appState.setArtisanScreen('onboarding_otp');
 };
@@ -1338,6 +1499,21 @@ window.enterArtisanDashboard = () => {
   appState.setArtisanScreen('dashboard');
 };
 
+// Sign Out Artisan Handlers
+window.requestArtisanSignOut = () => {
+  appState.data.showArtisanSignOutModal = true;
+  appState.notify();
+};
+
+window.cancelArtisanSignOut = () => {
+  delete appState.data.showArtisanSignOutModal;
+  appState.notify();
+};
+
+window.confirmArtisanSignOut = () => {
+  appState.signOutArtisan();
+};
+
 window.startProductCamera = async () => {
   appState.data.productCameraActive = true;
   appState.data.productCapturedPhoto = null;
@@ -1374,9 +1550,23 @@ window.startProductCamera = async () => {
 };
 
 window.captureProductPhoto = () => {
-  // For the controlled CRAFTORA demo:
-  // While demonstrating the bamboo basket product in live camera preview,
-  // capture sets the preloaded bamboo basket enhanced reference image as the captured result.
+  const video = document.getElementById('product_webcam_video');
+  if (video && video.videoWidth && video.videoHeight) {
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+      appState.data.productCapturedPhoto = dataUrl;
+      appState.notify();
+      return;
+    } catch (e) {
+      console.warn('Canvas webcam snapshot notice:', e);
+    }
+  }
+  // Controlled demo fallback
   appState.data.productCapturedPhoto = 'assets/bamboo_basket.png';
   appState.notify();
 };
@@ -1438,11 +1628,13 @@ window.proceedWithProductImage = (imageUrl) => {
     || (appState.data.savedArtisans && appState.data.savedArtisans[0])
     || { id: 'CRF-ART-001284', name: 'Ramesh Kumar', location: 'Assam, India', rating: 4.8, ratingCount: 24 };
   const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-  const newProductId = `CRF-BAM-00${randomSuffix}`;
+  const newProductId = `CRF-PRD-${randomSuffix}`;
 
   const currentArtisanId = currentArtisan.id || appState.data.selectedArtisanId || 'CRF-ART-001284';
   const currentRating = (typeof currentArtisan.rating === 'number') ? currentArtisan.rating : 0;
   const currentRatingCount = (typeof currentArtisan.ratingCount === 'number') ? currentArtisan.ratingCount : 0;
+
+  const isBambooDemoAsset = Boolean(imageUrl && (imageUrl === 'assets/bamboo_basket.png' || imageUrl === 'bamboo_basket.png'));
 
   const newDraft = {
     id: newProductId,
@@ -1450,18 +1642,21 @@ window.proceedWithProductImage = (imageUrl) => {
     artisanName: currentArtisan.name || 'Artisan Partner',
     artisanLocation: currentArtisan.location || 'India',
     artisanPhoto: currentArtisan.photoUrl || 'assets/artisan_ramesh.png',
-    title: 'Handcrafted Bamboo Basket',
-    category: currentArtisan.craftCategory || 'Bamboo Craft',
-    materials: ['Natural Bamboo', 'Cane'],
+    title: isBambooDemoAsset ? 'Handcrafted Bamboo Basket' : 'Analyzing with AI...',
+    category: isBambooDemoAsset ? (currentArtisan.craftCategory || 'Bamboo Craft') : 'Analyzing...',
+    materials: isBambooDemoAsset ? ['Natural Bamboo', 'Cane'] : ['Analyzing...'],
     productionTimeDays: 2,
-    description: 'Authentic handcrafted bamboo product woven with traditional techniques. Lightweight, durable, and eco-friendly.',
-    tags: ['Handmade', 'Eco-friendly', 'Bamboo', 'Craft'],
+    description: isBambooDemoAsset
+      ? 'Authentic handcrafted bamboo product woven with traditional techniques. Lightweight, durable, and eco-friendly.'
+      : 'AI vision is inspecting visual contours and materials...',
+    tags: isBambooDemoAsset ? ['Handmade', 'Eco-friendly', 'Bamboo', 'Craft'] : ['craft', 'handmade'],
     price: 650,
     rating: currentRating,
     ratingCount: currentRatingCount,
+    confidence: isBambooDemoAsset ? 'High confidence' : 'Needs review',
     costBreakdown: { materialCost: 180, labourCost: 250, productionTimeDays: 2, packagingCost: 40, totalEstimatedCost: 470 },
     aiInsight: { marketDemand: 'High', similarPriceRange: { min: 550, max: 750 }, indicativePriceRange: { min: 620, max: 680 }, suggestedPrice: 650, confidenceScore: 0.94 },
-    buyerMatches: [ { id: 'M1', buyerCategory: 'Handicraft Retailer', matchPercentage: 92, lookingFor: 'Bamboo crafts', requirement: 'Seeking eco-friendly home storage' } ],
+    buyerMatches: [ { id: 'M1', buyerCategory: 'Handicraft Retailer', matchPercentage: 92, lookingFor: 'Crafts', requirement: 'Seeking authentic crafts' } ],
     blockchainRecord: { network: 'Polygon Testnet Demo', recordType: 'Prototype Blockchain Record', status: 'Recorded', recordedAt: new Date().toLocaleDateString('en-GB'), isDemo: true, events: [{ title: 'Product Registration', date: new Date().toLocaleDateString('en-GB'), status: 'Completed' }] },
     status: 'draft',
     imageUrl: imageUrl || 'assets/bamboo_basket.png',
@@ -1472,18 +1667,146 @@ window.proceedWithProductImage = (imageUrl) => {
   appState.data.productCreationDraft = newDraft;
   appState.addProduct(newDraft);
   appState.data.selectedProductId = newDraft.id;
+
+  if (isBambooDemoAsset) {
+    appState.data.aiAnalysisPipeline = {
+      status: 'success',
+      enhancedImage: 'assets/bamboo_basket.png',
+      rawImage: imageUrl,
+      productId: newDraft.id,
+      data: {
+        productName: 'Handcrafted Bamboo Basket',
+        category: 'Bamboo Craft',
+        materials: 'Natural Bamboo, Cane',
+        description: 'Authentic handcrafted bamboo product woven with traditional techniques. Lightweight, durable, and eco-friendly.',
+        tags: ['Handmade', 'Eco-friendly', 'Bamboo', 'Craft'],
+        confidence: 'High confidence',
+        isDemoFallback: true
+      }
+    };
+  } else {
+    appState.data.aiAnalysisPipeline = {
+      status: 'analyzing',
+      enhancedImage: imageUrl,
+      rawImage: imageUrl,
+      productId: newDraft.id
+    };
+  }
+
   appState.setArtisanScreen('ai_analysis', { productId: newDraft.id });
 
-  // Asynchronously request backend AI analysis
+  if (!isBambooDemoAsset) {
+    window.runAIVisionPipeline(imageUrl, newDraft.id, currentArtisanId);
+  }
+};
+
+window.runAIVisionPipeline = async (imageUrl, productId, artisanId) => {
   try {
-    apiService.analyzeProductImage(
-      imageUrl || 'bamboo_basket.png',
-      currentArtisanId,
-      appState.data.language || 'en'
-    ).then(res => {
-      if (res) console.log('⚡ Backend AI Analysis received:', res);
-    }).catch(err => console.warn('AI analysis async notice:', err));
-  } catch(e) {}
+    const result = await analyzeProductImagePipeline(imageUrl, {
+      artisanId,
+      language: appState.data.language || 'en'
+    });
+
+    const targetProduct = (appState.data.products || []).find(p => p.id === productId);
+
+    if (result.analysisStatus === 'quality_failed') {
+      appState.data.aiAnalysisPipeline = {
+        status: 'quality_failed',
+        message: result.message || 'Image quality is insufficient for reliable analysis.',
+        rawImage: imageUrl,
+        productId
+      };
+      appState.notify();
+      return;
+    }
+
+    if (result.analysisStatus === 'error') {
+      appState.data.aiAnalysisPipeline = {
+        status: 'error',
+        message: result.message || 'AI analysis is temporarily unavailable.',
+        errorType: result.errorType || 'service_unavailable',
+        rawImage: imageUrl,
+        productId
+      };
+      appState.notify();
+      return;
+    }
+
+    // Success
+    const enhancedImg = result.enhancedImageUrl || imageUrl;
+    appState.data.aiAnalysisPipeline = {
+      status: 'success',
+      data: result,
+      enhancedImage: enhancedImg,
+      productId
+    };
+
+    const mats = Array.isArray(result.materials)
+      ? result.materials
+      : (result.materials ? [result.materials] : ['Natural Materials']);
+
+    if (targetProduct) {
+      targetProduct.title = result.productName;
+      targetProduct.category = result.category;
+      targetProduct.materials = mats;
+      targetProduct.description = result.description;
+      targetProduct.tags = Array.isArray(result.tags) ? result.tags : ['handmade', 'craft'];
+      targetProduct.imageUrl = enhancedImg;
+      targetProduct.confidence = result.confidence;
+      if (result.suggestedPrice) {
+        targetProduct.price = result.suggestedPrice;
+      }
+    }
+
+    if (appState.data.productCreationDraft && appState.data.productCreationDraft.id === productId) {
+      appState.data.productCreationDraft.title = result.productName;
+      appState.data.productCreationDraft.category = result.category;
+      appState.data.productCreationDraft.materials = mats;
+      appState.data.productCreationDraft.description = result.description;
+      appState.data.productCreationDraft.tags = Array.isArray(result.tags) ? result.tags : ['handmade', 'craft'];
+      appState.data.productCreationDraft.imageUrl = enhancedImg;
+      appState.data.productCreationDraft.confidence = result.confidence;
+    }
+
+    appState.notify();
+  } catch (err) {
+    console.warn('AI vision pipeline execution notice:', err);
+    appState.data.aiAnalysisPipeline = {
+      status: 'error',
+      message: 'Unable to complete AI analysis right now. Vision service unavailable.',
+      errorType: 'service_unavailable',
+      rawImage: imageUrl,
+      productId
+    };
+    appState.notify();
+  }
+};
+
+window.continueWithManualEntry = () => {
+  const pId = appState.data.aiAnalysisPipeline?.productId || appState.data.selectedProductId;
+  const p = (appState.data.products || []).find(item => item.id === pId);
+  if (p) {
+    if (p.title === 'Analyzing with AI...') p.title = 'New Product Listing';
+    if (p.category === 'Analyzing...') p.category = 'Needs Review';
+    if (p.materials?.[0] === 'Analyzing...') p.materials = ['Please enter materials'];
+    if (p.description?.includes('AI vision')) p.description = 'Please enter product description';
+  }
+  if (appState.data.productCreationDraft) {
+    if (appState.data.productCreationDraft.title === 'Analyzing with AI...') appState.data.productCreationDraft.title = 'New Product Listing';
+    if (appState.data.productCreationDraft.category === 'Analyzing...') appState.data.productCreationDraft.category = 'Needs Review';
+    if (appState.data.productCreationDraft.materials?.[0] === 'Analyzing...') appState.data.productCreationDraft.materials = ['Please enter materials'];
+    if (appState.data.productCreationDraft.description?.includes('AI vision')) appState.data.productCreationDraft.description = 'Please enter product description';
+  }
+  appState.setArtisanScreen('review_product', { productId: pId });
+};
+
+window.retryAIAnalysis = () => {
+  const pipeline = appState.data.aiAnalysisPipeline;
+  if (pipeline && pipeline.rawImage && pipeline.productId) {
+    appState.data.aiAnalysisPipeline.status = 'analyzing';
+    appState.notify();
+    window.runAIVisionPipeline(pipeline.rawImage, pipeline.productId, appState.data.selectedArtisanId);
+  }
 };
 
 window.triggerProductImageUpload = () => {

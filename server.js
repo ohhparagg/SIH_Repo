@@ -2,12 +2,33 @@ import http from 'http';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import sharp from 'sharp';
+import { GoogleGenAI } from '@google/genai';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const PORT = process.env.PORT || 3456;
 const ROOT = __dirname;
+
+// Safe .env loader: read key-value pairs without logging or exposing values
+const envPath = path.join(ROOT, '.env');
+if (fs.existsSync(envPath)) {
+  try {
+    const envData = fs.readFileSync(envPath, 'utf-8');
+    for (const line of envData.split(/\r?\n/)) {
+      const trimmed = line.trim();
+      if (trimmed && !trimmed.startsWith('#') && trimmed.includes('=')) {
+        const [key, ...rest] = trimmed.split('=');
+        const k = key.trim();
+        const v = rest.join('=').trim().replace(/^['"]|['"]$/g, '');
+        if (!process.env[k]) {
+          process.env[k] = v;
+        }
+      }
+    }
+  } catch (e) {}
+}
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -25,8 +46,373 @@ const MIME_TYPES = {
   '.ttf': 'font/ttf',
 };
 
-const server = http.createServer((req, res) => {
+/**
+ * Real Image Enhancement Stage
+ * - Auto-orients image based on EXIF
+ * - Resizes to max 1200x1200 while preserving aspect ratio
+ * - Contrast improvement: histogram normalization
+ * - Brightness & saturation modulation
+ * - Sharpening: unsharp masking
+ * Returns real enhanced JPEG buffer and data URL
+ */
+async function enhanceProductImage(imageSource) {
+  if (!imageSource) return null;
+  try {
+    let inputBuffer = null;
+    let mimeType = 'image/jpeg';
+
+    if (typeof imageSource === 'string' && imageSource.startsWith('data:')) {
+      const match = imageSource.match(/^data:(image\/[a-zA-Z0-9+.-]+);base64,(.+)$/);
+      if (match) {
+        mimeType = match[1];
+        inputBuffer = Buffer.from(match[2], 'base64');
+      } else {
+        const parts = imageSource.split(',');
+        inputBuffer = Buffer.from(parts[1] || parts[0], 'base64');
+      }
+    } else if (typeof imageSource === 'string' && (imageSource.startsWith('assets/') || !imageSource.includes('://'))) {
+      const safeFile = path.normalize(path.join(ROOT, imageSource));
+      if (safeFile.startsWith(ROOT) && fs.existsSync(safeFile)) {
+        inputBuffer = fs.readFileSync(safeFile);
+        mimeType = imageSource.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg';
+      }
+    } else if (Buffer.isBuffer(imageSource)) {
+      inputBuffer = imageSource;
+    }
+
+    if (!inputBuffer || inputBuffer.length === 0) return null;
+
+    const enhancedBuffer = await sharp(inputBuffer)
+      .rotate()
+      .resize({
+        width: 1200,
+        height: 1200,
+        fit: 'inside',
+        withoutEnlargement: true
+      })
+      .normalize()
+      .modulate({
+        brightness: 1.04,
+        saturation: 1.08
+      })
+      .sharpen({
+        sigma: 1.2,
+        m1: 1.0,
+        m2: 2.0
+      })
+      .jpeg({ quality: 90 })
+      .toBuffer();
+
+    return {
+      buffer: enhancedBuffer,
+      mimeType: 'image/jpeg',
+      dataUrl: `data:image/jpeg;base64,${enhancedBuffer.toString('base64')}`,
+      enhanced: true
+    };
+  } catch (err) {
+    console.warn('Image enhancement notice:', err.message);
+    return null;
+  }
+}
+
+/**
+ * Gemini Vision Product Analysis
+ * Sends the actual image to Google Gemini Vision.
+ * Enforces structured schema and honest uncertainty handling.
+ */
+async function analyzeWithGeminiVision(imageBuffer, mimeType = 'image/jpeg') {
+  const geminiKey = process.env.GEMINI_API_KEY;
+  if (!geminiKey || !imageBuffer) return null;
+
+  const base64Data = imageBuffer.toString('base64');
+
+  const systemInstruction = `You are CRAFTORA's AI product cataloguing assistant.
+Analyze the provided product image carefully.
+Identify the visible product.
+Generate an appropriate product name and category.
+Identify materials only when they can reasonably be inferred from visible characteristics.
+Generate a concise catalogue-ready description based only on observable information.
+Generate relevant search tags.
+Do not assume that every object is a handicraft.
+Do not invent hidden properties.
+If a material cannot be determined reliably from the image, state that clearly.
+If the product cannot be identified reliably, return 'Needs Review'.
+Return only valid structured JSON using the requested schema.`;
+
+  const userPrompt = `Analyze this product image carefully.
+Return ONLY valid JSON matching this exact schema:
+{
+  "productName": "Concise, descriptive product title (e.g. Ballpoint Pen, Handwoven Bamboo Basket, White Cotton Handkerchief, Ceramic Coffee Mug)",
+  "category": "Accurate category (e.g. Writing Instruments, Bamboo Craft, Fashion Accessories / Handkerchief, Drinkware / Pottery). If uncertain, write 'Needs Review'",
+  "materials": "Visually identifiable materials (e.g. Plastic, Metal, Natural Bamboo, Cotton, Glazed Ceramic). If cannot be determined reliably from the image, write 'Material cannot be reliably determined from the image.'",
+  "description": "Concise, catalogue-ready description based strictly on observable visual information.",
+  "tags": ["tag1", "tag2", "tag3", "tag4"],
+  "analysisStatus": "success",
+  "confidence": "High confidence or Needs review"
+}
+
+RULES:
+- If the item is a pen, return title 'Ballpoint Pen' (or similar) and category 'Writing Instruments'.
+- If the item is a handkerchief, return title 'Cotton Handkerchief' (or similar) and category 'Fashion Accessories' or 'Textile'.
+- If the item is a cup/pottery, return title 'Ceramic Mug' (or similar) and category 'Drinkware' or 'Pottery'.
+- If uncertain about the product or materials, use 'Needs Review' or 'Material cannot be reliably determined from the image.'
+- Never hallucinate details not visible.`;
+
+  // 1. Primary: @google/genai SDK
+  try {
+    const ai = new GoogleGenAI({ apiKey: geminiKey });
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            { text: userPrompt },
+            {
+              inlineData: {
+                mimeType: mimeType,
+                data: base64Data
+              }
+            }
+          ]
+        }
+      ],
+      config: {
+        systemInstruction: systemInstruction,
+        responseMimeType: 'application/json',
+        temperature: 0.2
+      }
+    });
+
+    const text = response.text || '';
+    if (text) {
+      const cleaned = text.replace(/```json/gi, '').replace(/```/g, '').trim();
+      const parsed = JSON.parse(cleaned);
+      if (parsed && (parsed.productName || parsed.category)) {
+        return {
+          analysisStatus: 'success',
+          productName: parsed.productName || 'Needs Review',
+          category: parsed.category || 'Needs Review',
+          materials: parsed.materials || 'Material cannot be reliably determined from the image.',
+          description: parsed.description || 'AI-generated catalogue description based on visible characteristics.',
+          tags: Array.isArray(parsed.tags) ? parsed.tags : ['product', 'item'],
+          confidence: parsed.confidence || 'High confidence',
+          suggestedPrice: 650,
+          isDemoFallback: false
+        };
+      }
+    }
+  } catch (sdkErr) {
+    console.warn('Gemini SDK attempt notice:', sdkErr.message);
+  }
+
+  // 2. Direct REST API fallback with timeout
+  try {
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(geminiKey)}`;
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: systemInstruction }] },
+        contents: [
+          {
+            role: 'user',
+            parts: [
+              { text: userPrompt },
+              {
+                inline_data: {
+                  mime_type: mimeType,
+                  data: base64Data
+                }
+              }
+            ]
+          }
+        ],
+        generationConfig: {
+          responseMimeType: 'application/json',
+          temperature: 0.2
+        }
+      }),
+      signal: AbortSignal.timeout(15000)
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      const candidateText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      const cleaned = candidateText.replace(/```json/gi, '').replace(/```/g, '').trim();
+      const parsed = JSON.parse(cleaned);
+      if (parsed && (parsed.productName || parsed.category)) {
+        return {
+          analysisStatus: 'success',
+          productName: parsed.productName || 'Needs Review',
+          category: parsed.category || 'Needs Review',
+          materials: parsed.materials || 'Material cannot be reliably determined from the image.',
+          description: parsed.description || 'AI-generated catalogue description based on visible characteristics.',
+          tags: Array.isArray(parsed.tags) ? parsed.tags : ['product', 'item'],
+          confidence: parsed.confidence || 'High confidence',
+          suggestedPrice: 650,
+          isDemoFallback: false
+        };
+      }
+    }
+  } catch (restErr) {
+    console.warn('Gemini REST attempt notice:', restErr.message);
+  }
+
+  return null;
+}
+
+const server = http.createServer(async (req, res) => {
   let reqPath = decodeURIComponent(req.url.split('?')[0]);
+
+  // Handle AI Product Analysis API Route (support both /api/analyze-product and /api/ai/analyze-product)
+  if (req.method === 'POST' && (reqPath === '/api/analyze-product' || reqPath === '/api/ai/analyze-product')) {
+    let body = '';
+    req.on('data', chunk => {
+      body += chunk;
+      if (body.length > 25 * 1024 * 1024) {
+        req.destroy();
+      }
+    });
+
+    req.on('end', async () => {
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+      try {
+        const payload = JSON.parse(body || '{}');
+        const rawImage = payload.image || '';
+        const filename = (payload.filename || '').toLowerCase();
+        const isBambooDemo = filename.includes('bamboo_basket') || rawImage.includes('bamboo_basket.png');
+
+        // 1. Perform Real Image Enhancement
+        const enhancedResult = await enhanceProductImage(rawImage);
+        const finalImageToAnalyze = enhancedResult ? enhancedResult.buffer : null;
+        const finalDataUrl = enhancedResult ? enhancedResult.dataUrl : rawImage;
+        const mimeType = enhancedResult ? enhancedResult.mimeType : 'image/jpeg';
+
+        // 2. Primary: Gemini Vision Analysis
+        if (process.env.GEMINI_API_KEY && finalImageToAnalyze) {
+          const geminiResult = await analyzeWithGeminiVision(finalImageToAnalyze, mimeType);
+          if (geminiResult) {
+            res.writeHead(200);
+            return res.end(JSON.stringify({
+              ...geminiResult,
+              enhancedImageUrl: finalDataUrl
+            }));
+          }
+        }
+
+        // 3. Secondary Fallback: Groq Vision if configured
+        const groqApiKey = process.env.GROQ_API_KEY;
+        if (groqApiKey && (finalDataUrl || rawImage)) {
+          try {
+            const aiPrompt = `Analyze the product image. Return ONLY valid JSON:
+{
+  "productName": "Accurate concise title",
+  "category": "Accurate category. If uncertain, write 'Needs Review'",
+  "materials": "Visible material. If uncertain, write 'Material cannot be reliably determined from the image.'",
+  "description": "Objective description based on visible characteristics.",
+  "tags": ["tag1", "tag2", "tag3"],
+  "confidence": "High confidence"
+}`;
+            const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${groqApiKey}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                model: 'llama-3.2-11b-vision-preview',
+                messages: [
+                  {
+                    role: 'user',
+                    content: [
+                      { type: 'text', text: aiPrompt },
+                      { type: 'image_url', image_url: { url: finalDataUrl || rawImage } }
+                    ]
+                  }
+                ],
+                temperature: 0.2
+              }),
+              signal: AbortSignal.timeout(12000)
+            });
+
+            if (groqRes.ok) {
+              const groqData = await groqRes.json();
+              const text = groqData.choices?.[0]?.message?.content || '';
+              const cleaned = text.replace(/```json/gi, '').replace(/```/g, '').trim();
+              const parsed = JSON.parse(cleaned);
+
+              res.writeHead(200);
+              return res.end(JSON.stringify({
+                analysisStatus: 'success',
+                productName: parsed.productName || 'Needs Review',
+                category: parsed.category || 'Needs Review',
+                materials: parsed.materials || 'Material cannot be reliably determined from the image.',
+                description: parsed.description || 'AI-generated description based on visible characteristics.',
+                tags: Array.isArray(parsed.tags) ? parsed.tags : ['product', 'item'],
+                confidence: parsed.confidence || 'High confidence',
+                suggestedPrice: 650,
+                enhancedImageUrl: finalDataUrl,
+                isDemoFallback: false
+              }));
+            }
+          } catch (apiErr) {
+            console.warn('Groq Vision API notice:', apiErr.message);
+          }
+        }
+
+        // 4. Demo Fallback: only for the predefined bamboo basket demo asset
+        if (isBambooDemo) {
+          res.writeHead(200);
+          return res.end(JSON.stringify({
+            analysisStatus: 'success',
+            productName: 'Handcrafted Bamboo Basket',
+            category: 'Bamboo Craft',
+            materials: 'Natural Bamboo, Cane',
+            description: 'Authentic handcrafted bamboo product woven with traditional split-cane techniques. Lightweight, durable, and eco-friendly.',
+            tags: ['Handmade', 'Eco-friendly', 'Bamboo', 'Craft', 'Basket'],
+            confidence: 'High confidence',
+            suggestedPrice: 650,
+            enhancedImageUrl: finalDataUrl || 'assets/bamboo_basket.png',
+            isDemoFallback: true
+          }));
+        }
+
+        // 5. For any other unseen product when API is not configured or failed:
+        // Return honest service unavailable error without silently faking bamboo basket data
+        res.writeHead(200);
+        return res.end(JSON.stringify({
+          analysisStatus: 'error',
+          errorType: 'service_unavailable',
+          message: 'AI analysis is currently unavailable.',
+          enhancedImageUrl: finalDataUrl
+        }));
+
+      } catch (err) {
+        res.writeHead(500);
+        return res.end(JSON.stringify({
+          analysisStatus: 'error',
+          errorType: 'server_error',
+          message: 'Unable to complete AI analysis right now: ' + err.message
+        }));
+      }
+    });
+    return;
+  }
+
+  // Handle CORS preflight
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204, {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+    });
+    return res.end();
+  }
+
   if (reqPath === '/' || reqPath === '') {
     reqPath = '/index.html';
   }
@@ -57,6 +443,41 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(PORT, '127.0.0.1', () => {
+/**
+ * Server Startup & Gemini API Validation
+ */
+async function validateGeminiAtStartup() {
+  const geminiKey = process.env.GEMINI_API_KEY;
+  if (!geminiKey) {
+    console.error('GEMINI_API_KEY is not configured.');
+    return;
+  }
+
+  try {
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(geminiKey)}`;
+    const testRes = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: 'Ping test. Reply with JSON: {"status": "ok"}' }] }],
+        generationConfig: { responseMimeType: 'application/json', temperature: 0.1 }
+      }),
+      signal: AbortSignal.timeout(10000)
+    });
+
+    if (testRes.ok) {
+      console.log('✓ Gemini API connection validated successfully.');
+    } else {
+      const errJson = await testRes.json().catch(() => ({}));
+      const msg = errJson?.error?.message || `HTTP ${testRes.status}`;
+      console.warn(`Gemini API startup validation notice: ${msg}`);
+    }
+  } catch (err) {
+    console.warn('Gemini API startup validation notice:', err.message);
+  }
+}
+
+server.listen(PORT, '127.0.0.1', async () => {
   console.log(`CRAFTORA running at http://localhost:${PORT}/ (http://127.0.0.1:${PORT}/)`);
+  await validateGeminiAtStartup();
 });
